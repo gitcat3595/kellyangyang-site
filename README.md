@@ -8,12 +8,10 @@ Static site, no build step. GitHub Pages serves `main` from the repo root.
 /                      landing
 /apps/                 index of mini-apps
 /apps/<name>/          one mini-app per directory
-/app/<name>/           legacy path — redirect stubs only, do not add new ones
 ```
 
 **Every mini-app goes under `/apps/` (plural), one directory per app,
-each a single self-contained `index.html`.** `/app/todayscup/` is kept
-only as a redirect to `/apps/todayscup/` so older shared links survive.
+each a single self-contained `index.html`.**
 
 Self-contained means: no external scripts, no fetch, assets inlined.
 `iro-color` follows this fully; `todayscup` still pulls Google Fonts.
