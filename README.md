@@ -24,6 +24,6 @@ Self-contained means: no external scripts, no fetch, assets inlined.
 
 ## Note on iro-color
 
-`apps/iro-color/index.html` is generated from a template plus a colour-data
+`apps/iro-color/index.html` is generated from a template plus a color-data
 file. Hand-edits to it survive only until the next regeneration, so put
 lasting changes in the source rather than the built file.
