@@ -116,12 +116,22 @@ body{
   max-width:760px;margin:0 auto;padding:0 20px;
   height:56px;display:flex;align-items:center;justify-content:space-between;gap:12px;
 }
-.brand{display:flex;align-items:baseline;gap:9px;text-decoration:none;color:var(--fg)}
-.brand-mark{
-  font-size:16px;font-weight:650;letter-spacing:.14em;
+.brand{display:flex;align-items:baseline;gap:7px;text-decoration:none;color:var(--fg);min-width:0}
+.brand-mark{font-size:16px;font-weight:750;letter-spacing:.14em}
+.brand-sub{
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  color:var(--fg-3);text-transform:uppercase;white-space:nowrap;
 }
-.brand-sub{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--fg-3);text-transform:uppercase}
-@media (max-width:430px){.brand-sub{display:none}}
+@media (max-width:400px){
+  .brand-mark{font-size:15px}
+  .brand-sub{font-size:9px;letter-spacing:.06em}
+}
+/* below this the bar carries the wordmark and the menu only — everything
+   else moves inside the menu, where there is room to label it */
+@media (max-width:620px){
+  /* .icon-btn sets display later in the sheet, so this needs to outrank it */
+  .bar .bar-only-wide{display:none}
+}
 
 .bar-actions{display:flex;align-items:center;gap:6px}
 
@@ -145,20 +155,40 @@ body{
 .menu-wrap{position:relative}
 .menu{
   position:absolute;top:calc(100% + 8px);right:0;z-index:60;
-  min-width:180px;padding:6px;
+  min-width:200px;padding:6px;
   background:var(--bg);border:1px solid var(--line);border-radius:10px;
   box-shadow:var(--shadow);
   display:none;
 }
 .menu.open{display:block}
 .menu button{
-  display:block;width:100%;text-align:left;
+  display:flex;align-items:center;gap:11px;width:100%;text-align:left;
   padding:11px 12px;border:0;border-radius:6px;background:transparent;
   color:var(--fg-2);cursor:pointer;
   font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;
   text-transform:uppercase;font-weight:500;
   transition:background-color .12s,color .12s;
 }
+.menu > button svg{width:15px;height:15px;flex:0 0 auto}
+
+/* language and mode are two-state toggles, so they show both options */
+.menu-seg{
+  display:grid;grid-template-columns:1fr 1fr;gap:3px;
+  margin:3px 4px 1px;padding:3px;
+  background:var(--surface);border-radius:7px;
+}
+.menu-seg + .menu-seg{margin-top:5px}
+.seg{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:8px 6px;border:0;border-radius:5px;background:transparent;
+  color:var(--fg-3);cursor:pointer;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;
+  text-transform:uppercase;font-weight:500;
+  transition:background-color .14s,color .14s;
+}
+.seg svg{width:15px;height:15px;display:block}
+.seg:hover{color:var(--fg-2)}
+.seg.active{background:var(--bg);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.16)}
 .menu button:hover{background:var(--surface);color:var(--fg)}
 .menu button[aria-current="true"]{color:var(--fg);font-weight:560}
 .menu-rule{height:1px;background:var(--line);margin:6px 4px}
@@ -243,19 +273,34 @@ body{
 }
 @media (min-width:560px){.swatch-grid{grid-template-columns:repeat(10,1fr)}}
 
+/* The button is a fixed hit area that never moves; only the chip inside it
+   scales. Shrinking the button itself meant a finger could end up outside it
+   on touchend, so taps were silently swallowed. */
 .swatch{
   position:relative;
   aspect-ratio:1/1;
   width:100%;
   min-height:38px;
   border:0;padding:0;
-  border-radius:var(--r-tile);
-  background:var(--c);
+  background:none;
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
+}
+.swatch .chip{
+  position:absolute;inset:0;
+  border-radius:var(--r-tile);
+  background:var(--c);
   /* hairline keeps near-white and near-black chips readable in both themes */
   box-shadow:inset 0 0 0 1px var(--line);
   transition:transform .18s cubic-bezier(.22,1,.36,1),box-shadow .18s ease;
+}
+.swatch .chip::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background-image:var(--paper-tooth),var(--paper-grain);
+  background-size:160px 160px,60px 60px;
+  background-blend-mode:soft-light;
+  mix-blend-mode:soft-light;
+  opacity:.3;
 }
 .swatch::after{
   content:"";position:absolute;inset:-3px;border-radius:calc(var(--r-tile) + 3px);
@@ -265,16 +310,22 @@ body{
    overlapped the row above. No ring either: that read as a hard black edge in
    light mode. The ring stays for keyboard focus, where an unmistakable
    outline matters more than the effect. */
-.swatch:hover,.swatch:focus-visible{
+/* hover only where a pointer can actually hover — on touch it sticks */
+@media (hover:hover){
+  .swatch:hover{z-index:2}
+  .swatch:hover .chip{
+    transform:scale(.94);
+    box-shadow:inset 0 0 0 1px var(--line),inset 0 2px 7px rgba(0,0,0,.22);
+  }
+}
+.swatch:focus-visible{z-index:2}
+.swatch:focus-visible .chip{
   transform:scale(.94);
-  box-shadow:
-    inset 0 0 0 1px var(--line),
-    inset 0 2px 7px rgba(0,0,0,.22);
-  z-index:2;
+  box-shadow:inset 0 0 0 1px var(--line),inset 0 2px 7px rgba(0,0,0,.22);
 }
 .swatch:focus-visible::after{border-color:var(--ring)}
 .swatch:focus-visible{outline:none}
-.swatch:active{
+.swatch:active .chip{
   transform:scale(.88);
   box-shadow:inset 0 0 0 1px var(--line),inset 0 3px 9px rgba(0,0,0,.3);
 }
@@ -293,7 +344,7 @@ body{
   box-shadow:inset 0 0 0 1px var(--line);
   transition:background-color .15s ease;
 }
-.readout-name{color:var(--fg);font-weight:500}
+.readout-name{color:var(--fg-2);font-weight:500}
 .readout-hex{margin-left:auto;color:var(--fg-3)}
 .readout.idle .readout-name,.readout.idle .readout-hex{color:var(--fg-3);font-weight:400}
 
@@ -338,17 +389,7 @@ body{
   opacity:.42;
 }
 
-/* the same sheet of paper under the palette wall */
-.swatch::before{
-  content:"";
-  position:absolute; inset:0; pointer-events:none;
-  border-radius:inherit;
-  background-image: var(--paper-tooth), var(--paper-grain);
-  background-size: 160px 160px, 60px 60px;
-  background-blend-mode: soft-light;
-  mix-blend-mode: soft-light;
-  opacity:.3;
-}
+
 .swatch-card > *{position:relative;z-index:1}
 
 
@@ -629,10 +670,10 @@ body{
   <div class="bar-in">
     <a class="brand" href="#" onclick="goTop();return false">
       <span class="brand-mark">IRO</span>
-      <span class="brand-sub" data-i18n="brand.sub">Colour Journal</span>
+      <span class="brand-sub">—&nbsp;<span data-i18n="brand.sub">Colour Journal</span></span>
     </a>
     <div class="bar-actions">
-      <button class="icon-btn" id="themeBtn" onclick="toggleTheme()">
+      <button class="icon-btn bar-only-wide" id="themeBtn" onclick="toggleTheme()">
         <svg class="ico ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
           <circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/>
         </svg>
@@ -640,8 +681,8 @@ body{
           <path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8a6.6 6.6 0 0 0 10.8 10.8Z"/>
         </svg>
       </button>
-      <button class="icon-btn" id="langBtn" onclick="toggleLang()" aria-label="Switch language">EN</button>
-      <button class="icon-btn" onclick="goCalendar()" data-i18n="nav.journal">Journal</button>
+      <button class="icon-btn bar-only-wide" id="langBtn" onclick="toggleLang()" aria-label="Switch language">EN</button>
+      <button class="icon-btn bar-only-wide" onclick="goCalendar()" data-i18n="nav.journal">Journal</button>
       <span class="menu-wrap">
         <button class="icon-btn" id="menuBtn" aria-haspopup="true" aria-expanded="false" aria-label="Menu">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
@@ -649,10 +690,31 @@ body{
           </svg>
         </button>
         <div class="menu" id="menu" role="menu">
-          <button role="menuitem" onclick="menuGo('top')"      data-i18n="nav.palette">Palette</button>
-          <button role="menuitem" onclick="menuGo('calendar')" data-i18n="nav.journal">Journal</button>
+          <button role="menuitem" onclick="menuGo('top')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4"/></svg>
+            <span data-i18n="nav.palette">Palette</span>
+          </button>
+          <button role="menuitem" onclick="menuGo('calendar')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.5h17M8 3.2v3.4M16 3.2v3.4"/></svg>
+            <span data-i18n="nav.journal">Journal</span>
+          </button>
+          <button role="menuitem" onclick="menuGo('guide')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7.2C10.4 5.6 8.2 4.9 5.3 4.9c-.9 0-1.6.1-2.1.2v13.4c.5-.1 1.2-.2 2.1-.2 2.9 0 5.1.7 6.7 2.3"/><path d="M12 7.2c1.6-1.6 3.8-2.3 6.7-2.3.9 0 1.6.1 2.1.2v13.4c-.5-.1-1.2-.2-2.1-.2-2.9 0-5.1.7-6.7 2.3"/><path d="M12 7.2v13.4"/></svg>
+            <span data-i18n="nav.guide">Guide</span>
+          </button>
           <div class="menu-rule"></div>
-          <button role="menuitem" onclick="menuGo('guide')"    data-i18n="nav.guide">Guide</button>
+          <div class="menu-seg" role="group" aria-label="Language">
+            <button type="button" class="seg" data-lang-opt="en" onclick="applyLang('en')">EN</button>
+            <button type="button" class="seg" data-lang-opt="ja" onclick="applyLang('ja')">JP</button>
+          </div>
+          <div class="menu-seg" role="group" id="themeSeg">
+            <button type="button" class="seg" data-theme-opt="light" onclick="applyTheme('light')" aria-label="Light mode">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg>
+            </button>
+            <button type="button" class="seg" data-theme-opt="dark" onclick="applyTheme('dark')" aria-label="Dark mode">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8a6.6 6.6 0 0 0 10.8 10.8Z"/></svg>
+            </button>
+          </div>
         </div>
       </span>
     </div>
@@ -1103,8 +1165,8 @@ var GUIDE = {
   "en": "The following major-colour notes are informed in part by btrax’s discussion of colour and behaviour, and are summarised with cultural and individual differences in mind."
  },
  "heading": {
-  "ja": "色と気分のガイド",
-  "en": "A Guide to Colour and Mood"
+  "ja": "IRO - 色の日記の使い方",
+  "en": "How to use IRO - Colour Journal"
  },
  "coloursHeading": {
   "ja": "主な色の見え方",
@@ -1194,6 +1256,7 @@ function paintCard(el, hex){
    ============================================================ */
 function applyTheme(t){
   document.documentElement.setAttribute('data-theme', t);
+  if(typeof syncMenuLabels === 'function') syncMenuLabels();
   var meta = document.querySelector('meta[name="theme-color"]');
   if(meta) meta.setAttribute('content', t === 'dark' ? '#0a0a0b' : '#ffffff');
   try{ localStorage.setItem('iro-theme', t); }catch(e){}
@@ -1236,6 +1299,7 @@ var I18N = {
     'cal.eyebrow':'Journal', 'cal.today':'Today', 'cal.hint':'Tap a day to record',
     'foot.local':'Stored on this device',
     'theme.label':'Switch between light and dark',
+    'theme.light':'Light mode', 'theme.dark':'Dark mode',
     'nav.palette':'Palette', 'nav.guide':'Guide', 'menu.label':'Menu',
     'dow':['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
     'locale':'en-GB',
@@ -1270,6 +1334,7 @@ var I18N = {
     'cal.hint':'日付をえらんで記録',
     'foot.local':'この端末に保存されます',
     'theme.label':'ライトとダークを切り替え',
+    'theme.light':'ライトモード', 'theme.dark':'ダークモード',
     'nav.palette':'色見本', 'nav.guide':'ガイド', 'menu.label':'メニュー',
     'dow':['月','火','水','木','金','土','日'],
     'locale':'ja-JP',
@@ -1316,6 +1381,7 @@ function applyLang(l){
   if(tb) tb.setAttribute('aria-label', t('theme.label'));
   var mb = document.getElementById('menuBtn');
   if(mb) mb.setAttribute('aria-label', t('menu.label'));
+  syncMenuLabels();
 
   var btn = document.getElementById('langBtn');
   if(btn) btn.textContent = lang === 'ja' ? '日本語' : 'EN';
@@ -1391,6 +1457,19 @@ function renderCopyright(){
 /* ============================================================
    menu
    ============================================================ */
+/* the toggles live in the menu on small screens, so they must say what they
+   will switch to */
+function syncMenuLabels(){
+  var theme = document.documentElement.getAttribute('data-theme');
+  var segs = document.querySelectorAll('.seg');
+  for(var i=0;i<segs.length;i++){
+    var s = segs[i];
+    var l = s.getAttribute('data-lang-opt');
+    var th = s.getAttribute('data-theme-opt');
+    s.classList.toggle('active', l ? l === lang : th === theme);
+  }
+}
+
 function setMenu(open){
   var m = document.getElementById('menu'), b = document.getElementById('menuBtn');
   if(!m || !b) return;
@@ -1496,8 +1575,11 @@ function renderPalette(){
     var idx = colorData.indexOf(c);
     var b = document.createElement('button');
     b.className = 'swatch';
-    b.style.setProperty('--c', c.hex);
     b.setAttribute('aria-label', c.romaji + ' ' + c.name + ' ' + c.hex);
+    var chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.style.setProperty('--c', c.hex);
+    b.appendChild(chip);
     b.addEventListener('click', function(){ selectColor(idx); });
     b.addEventListener('mouseenter', function(){ setReadout(c); });
     b.addEventListener('focus', function(){ setReadout(c); });
