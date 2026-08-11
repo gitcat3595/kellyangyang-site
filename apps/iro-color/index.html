@@ -153,8 +153,10 @@ body{
 .menu.open{display:block}
 .menu button{
   display:block;width:100%;text-align:left;
-  padding:10px 12px;border:0;border-radius:6px;background:transparent;
-  color:var(--fg-2);cursor:pointer;font-family:var(--sans);font-size:14px;
+  padding:11px 12px;border:0;border-radius:6px;background:transparent;
+  color:var(--fg-2);cursor:pointer;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;
+  text-transform:uppercase;font-weight:500;
   transition:background-color .12s,color .12s;
 }
 .menu button:hover{background:var(--surface);color:var(--fg)}
@@ -259,20 +261,23 @@ body{
   content:"";position:absolute;inset:-3px;border-radius:calc(var(--r-tile) + 3px);
   border:1.5px solid transparent;transition:border-color .15s ease;pointer-events:none;
 }
-/* Hover lifts the chip off the sheet with shadow alone — no ring, which read
-   as a hard black edge in light mode. The ring is kept for keyboard focus,
-   where an unmistakable outline matters more than the effect. */
+/* The chip presses into the sheet rather than lifting off it — raised, it
+   overlapped the row above. No ring either: that read as a hard black edge in
+   light mode. The ring stays for keyboard focus, where an unmistakable
+   outline matters more than the effect. */
 .swatch:hover,.swatch:focus-visible{
-  transform:translateY(-3px) scale(1.02);
+  transform:scale(.94);
   box-shadow:
     inset 0 0 0 1px var(--line),
-    0 2px 4px -1px rgba(0,0,0,.28),
-    0 10px 22px -6px rgba(0,0,0,.45);
+    inset 0 2px 7px rgba(0,0,0,.22);
   z-index:2;
 }
 .swatch:focus-visible::after{border-color:var(--ring)}
 .swatch:focus-visible{outline:none}
-.swatch:active{transform:translateY(0) scale(.97)}
+.swatch:active{
+  transform:scale(.88);
+  box-shadow:inset 0 0 0 1px var(--line),inset 0 3px 9px rgba(0,0,0,.3);
+}
 
 /* live readout — fixed height so the grid never shifts */
 .readout{
@@ -414,18 +419,21 @@ body{
 /* ---------- buttons ---------- */
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:40px}
 .btn{
-  min-height:48px;padding:13px 18px;
-  font-family:var(--sans);font-size:14px;font-weight:520;letter-spacing:-.005em;
+  min-height:46px;padding:13px 18px;
+  font-family:var(--mono);font-size:11.5px;font-weight:500;
+  letter-spacing:.12em;text-transform:uppercase;
   border-radius:var(--r-ui);
-  background:transparent;border:1px solid var(--line-2);color:var(--fg);
-  cursor:pointer;transition:background-color .15s,border-color .15s,opacity .15s;
+  /* quiet by default: the colour is the loudest thing on the page, not the UI */
+  background:transparent;border:1px solid var(--line);color:var(--fg-2);
+  cursor:pointer;transition:background-color .15s,border-color .15s,color .15s;
   -webkit-tap-highlight-color:transparent;
 }
-.btn:hover{background:var(--surface);border-color:var(--fg-3)}
-.btn:active{opacity:.75}
-.btn-primary{background:var(--fg);color:var(--bg);border-color:var(--fg)}
-.btn-primary:hover{background:var(--fg);border-color:var(--fg);opacity:.86}
-.btn-ghost{border-color:var(--line);color:var(--fg-2)}
+.btn:hover{background:var(--surface);border-color:var(--line-2);color:var(--fg)}
+.btn:active{background:var(--surface-2)}
+/* primary is a shade of emphasis, not an inverted slab */
+.btn-primary{background:var(--surface);border-color:var(--line-2);color:var(--fg)}
+.btn-primary:hover{background:var(--surface-2);border-color:var(--fg-3)}
+.btn-ghost{border-color:var(--line);color:var(--fg-3)}
 .btn-danger{border-color:var(--line);color:var(--fg-3)}
 .btn-danger:hover{color:#e5484d;border-color:#e5484d;background:transparent}
 
@@ -508,6 +516,58 @@ body{
   font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);
   display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
 }
+
+/* ---------- month's entries: a fold-out list, each row removable ---------- */
+.entry-block{margin-top:24px;border-top:1px solid var(--line)}
+.entry-toggle{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 0;background:none;border:0;cursor:pointer;
+  color:var(--fg-2);font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.12em;text-transform:uppercase;font-weight:500;
+  transition:color .15s;-webkit-tap-highlight-color:transparent;
+}
+.entry-toggle:hover{color:var(--fg)}
+.entry-toggle .chev{width:15px;height:15px;flex:0 0 auto;transition:transform .32s cubic-bezier(.22,1,.36,1)}
+.entry-block.open .entry-toggle .chev{transform:rotate(180deg)}
+/* 0fr -> 1fr animates the natural height without having to measure it */
+.entry-collapse{
+  display:grid;grid-template-rows:0fr;
+  transition:grid-template-rows .34s cubic-bezier(.22,1,.36,1);
+}
+.entry-collapse > *{overflow:hidden}
+.entry-block.open .entry-collapse{grid-template-rows:1fr}
+.entry-list{display:grid;gap:0;padding-bottom:6px}
+.entry{
+  display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;
+  padding:12px 0;border-bottom:1px solid var(--line);
+}
+.entry-chip{
+  width:30px;height:30px;border-radius:var(--r-tile);
+  background:var(--c);box-shadow:inset 0 0 0 1px var(--line);
+  background-image:var(--paper-tooth);background-size:110px 110px;
+  background-blend-mode:soft-light;
+}
+.entry-main{min-width:0;cursor:pointer}
+.entry-day{
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--fg-3);
+}
+.entry-name{font-size:14px;font-weight:560;margin-top:3px}
+.entry-note{
+  font-size:13px;color:var(--fg-2);margin-top:3px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.entry-del{
+  width:30px;height:30px;flex:0 0 auto;
+  display:grid;place-items:center;
+  background:transparent;border:1px solid var(--line);border-radius:var(--r-ui);
+  color:var(--fg-3);cursor:pointer;
+  transition:color .15s,border-color .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.entry-del:hover{color:#e5484d;border-color:#e5484d}
+.entry-del svg{width:13px;height:13px;display:block}
+.entry-empty{padding:20px 0;font-size:14px;color:var(--fg-3)}
 
 /* ============================================================
    MODAL
@@ -750,6 +810,16 @@ body{
     <div class="cal-grid" id="calDow"></div>
     <div class="cal-grid" id="calGrid" style="margin-top:2px"></div>
 
+    <div class="entry-block" id="entryBlock">
+      <button class="entry-toggle" id="entryToggle" aria-expanded="false" aria-controls="entryCollapse">
+        <span id="entryToggleLabel"></span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg>
+      </button>
+      <div class="entry-collapse" id="entryCollapse">
+        <div><div class="entry-list" id="entryList"></div></div>
+      </div>
+    </div>
+
     <div class="cal-legend">
       <span id="calCount"></span>
       <span data-i18n="cal.hint">Tap a day to record</span>
@@ -909,7 +979,7 @@ var GUIDE = {
     "en": "Log your mood"
    },
    "ja": [
-    "その日の気分にいちばん近い色を一つ選んでください。毎日の色を記録するこで、週や月の単位で色の傾向やパターンが見えるかもしれません。それぞれの色の意味やイメージと照らし合わせて今の気分と向き合うきっけにしてみてください。これは診断ではなく、自分のリズムや環境との関係に気づくための、やさしい観察の習慣です。"
+    "その日の気分にいちばん近い色を一つえらんでください。毎日の色を記録するこで、週や月の単位で色の傾向やパターンが見えるかもしれません。それぞれの色の意味やイメージと照らし合わせて今の気分と向き合うきっけにしてみてください。これは診断ではなく、自分のリズムや環境との関係に気づくための、やさしい観察の習慣です。"
    ],
    "en": [
     "Choose the colour that feels closest to your mood that day. By recording a colour each day, you may begin to notice trends and patterns over weeks or months. Use each colour’s meanings and associations as a prompt to reflect on how you are feeling right now. This is not a diagnostic tool, but a gentle practice for noticing your own rhythms and relationship with your surroundings."
@@ -1175,11 +1245,12 @@ var I18N = {
     copied:function(v){ return 'Copied ' + v; },
     deleted:'Entry deleted', pickDate:'Pick a date', saveFail:'Could not save',
     confirmDel:function(d){ return 'Delete the entry for ' + d + '?'; },
-    noEntry:'no entry'
+    noEntry:'no entry', noEntries:'No entries this month yet.',
+    entries:function(n){ return n === 1 ? '1 note this month' : n + ' notes this month'; }
   },
   ja: {
     'brand.sub':'色の日記', 'nav.journal':'日記を見る',
-    'top.tagline':'色を選んで、気分を知る',
+    'top.tagline':'色をえらんで、気分を知る',
     'top.h1':'今日は何色？',
     'top.lede':'今にしっくりくる色をえらんで',
     'top.readout':'色をえらぶ',
@@ -1187,7 +1258,7 @@ var I18N = {
     'back.palette':'← 色見本', 'back.colour':'← 色',
     'sec.mood':'気分', 'sec.moodSub':'MOOD',
     'sec.origin':'由来', 'sec.originSub':'ORIGIN',
-    'btn.again':'選び直す', 'btn.save':'日記に保存',
+    'btn.again':'えらび直す', 'btn.save':'日記に保存',
     'btn.cancel':'やめる', 'btn.saveEntry':'保存する',
     'btn.palette':'色見本', 'btn.viewJournal':'日記を見る',
     'btn.delete':'削除', 'btn.close':'閉じる',
@@ -1196,7 +1267,7 @@ var I18N = {
     'jr.ph':'今日がこの色だった理由は？',
     'sv.eyebrow':'保存しました',
     'cal.eyebrow':'日記', 'cal.today':'今日',
-    'cal.hint':'日付を選んで記録',
+    'cal.hint':'日付をえらんで記録',
     'foot.local':'この端末に保存されます',
     'theme.label':'ライトとダークを切り替え',
     'nav.palette':'色見本', 'nav.guide':'ガイド', 'menu.label':'メニュー',
@@ -1207,10 +1278,11 @@ var I18N = {
     count:function(n,t){ return '今月 ' + n + ' 件 · 全 ' + t + ' 件'; },
     copied:function(v){ return v + ' をコピーしました'; },
     deleted:'記録を削除しました',
-    pickDate:'日付を選んでください',
+    pickDate:'日付をえらんでください',
     saveFail:'保存できませんでした',
     confirmDel:function(d){ return d + ' の記録を削除しますか？'; },
-    noEntry:'記録なし'
+    noEntry:'記録なし', noEntries:'今月の記録はまだありません。',
+    entries:function(n){ return '今月の記録 ' + n + ' 件'; }
   }
 };
 
@@ -1306,17 +1378,6 @@ function renderGuide(){
   GUIDE.story[lang].forEach(function(t){ about.appendChild(el('p', null, t)); });
   host.appendChild(about);
 
-  var refs = el('section', 'guide-sec');
-  refs.appendChild(el('h3', null, GUIDE.refsHeading[lang]));
-  var ul = el('ul', 'ref-list');
-  GUIDE.refs.forEach(function(u){
-    var li = el('li');
-    var a = el('a', null, u);
-    a.href = u; a.target = '_blank'; a.rel = 'noopener noreferrer';
-    li.appendChild(a); ul.appendChild(li);
-  });
-  refs.appendChild(ul);
-  host.appendChild(refs);
 }
 
 /* one copyright line, echoing the wordmark above */
@@ -1431,11 +1492,13 @@ function renderPalette(){
   renderedCols = gridColumns(grid);
   layoutOrder(colorData, renderedCols).forEach(function(c){
     if(!c) return;
+    // the wall is reordered for layout, so resolve the real index
+    var idx = colorData.indexOf(c);
     var b = document.createElement('button');
     b.className = 'swatch';
     b.style.setProperty('--c', c.hex);
     b.setAttribute('aria-label', c.romaji + ' ' + c.name + ' ' + c.hex);
-    b.addEventListener('click', function(){ selectColor(i); });
+    b.addEventListener('click', function(){ selectColor(idx); });
     b.addEventListener('mouseenter', function(){ setReadout(c); });
     b.addEventListener('focus', function(){ setReadout(c); });
     b.addEventListener('mouseleave', clearReadout);
@@ -1662,6 +1725,59 @@ function renderCalendar(){
   }
 
   setText('calCount', t('count')(monthCount, all.length));
+  renderEntryList(y, m, all);
+  setText('entryToggleLabel', t('entries')(monthCount));
+}
+
+/* Every note for the month, each with its own delete — reaching it only
+   through a calendar tile made removing an entry hard to find. */
+function renderEntryList(y, m, all){
+  var host = document.getElementById('entryList');
+  if(!host) return;
+  host.innerHTML = '';
+
+  var mine = all.filter(function(e){
+    var d = String(e.date).split('-');
+    return +d[0] === y && +d[1] === m + 1;
+  }).sort(function(a, b){ return a.date < b.date ? -1 : 1; });
+
+  if(!mine.length){
+    host.appendChild(el('div', 'entry-empty', t('noEntries')));
+    return;
+  }
+
+  mine.forEach(function(e){
+    var row = el('div', 'entry');
+
+    var chip = el('span', 'entry-chip');
+    chip.style.setProperty('--c', e.hex);
+    row.appendChild(chip);
+
+    var main = el('div', 'entry-main');
+    main.appendChild(el('div', 'entry-day', fmtDate(e.date)));
+    main.appendChild(el('div', 'entry-name', e.colorName + '  ' + e.romaji));
+    if(e.note) main.appendChild(el('div', 'entry-note', e.note));
+    main.addEventListener('click', function(){ openModal(e.date); });
+    row.appendChild(main);
+
+    var del = el('button', 'entry-del');
+    del.setAttribute('aria-label', t('btn.delete') + ' ' + fmtDate(e.date));
+    del.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M9.5 7V5.2h5V7M6.5 7l.9 12.1h9.2L17.5 7"/></svg>';
+    del.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      removeEntry(e.date);
+    });
+    row.appendChild(del);
+
+    host.appendChild(row);
+  });
+}
+
+function removeEntry(dateStr){
+  if(!confirm(t('confirmDel')(fmtDate(dateStr)))) return;
+  saveEntries(loadEntries().filter(function(e){ return e.date !== dateStr; }));
+  renderCalendar();
+  toast(t('deleted'));
 }
 
 /* ============================================================
@@ -1704,12 +1820,9 @@ function closeModal(){
 
 function deleteEntry(){
   if(!modalDate) return;
-  if(!confirm(t('confirmDel')(fmtDate(modalDate)))) return;
-  var list = loadEntries().filter(function(e){ return e.date !== modalDate; });
-  saveEntries(list);
+  var d = modalDate;
   closeModal();
-  renderCalendar();
-  toast(t('deleted'));
+  removeEntry(d);
 }
 
 /* ============================================================
@@ -1734,6 +1847,16 @@ document.addEventListener('click', function(e){
   var w = e.target.closest ? e.target.closest('.menu-wrap') : null;
   if(!w) setMenu(false);
 });
+
+var entryToggle = document.getElementById('entryToggle');
+if(entryToggle){
+  entryToggle.addEventListener('click', function(){
+    var b = document.getElementById('entryBlock');
+    var open = !b.classList.contains('open');
+    b.classList.toggle('open', open);
+    entryToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+}
 
 var resizeTimer = null;
 window.addEventListener('resize', function(){
