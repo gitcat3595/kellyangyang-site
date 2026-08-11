@@ -160,9 +160,8 @@
     position:absolute;
     top:50%;
     left:50%;
-    width:100%;
-    height:100%;
-    object-fit:cover;
+    max-width:none;
+    max-height:none;
     display:none;
     transform-origin:center center;
     user-select:none;
@@ -245,13 +244,63 @@
     font-size:12.5px;
   }
 
-  .hint{
-    text-align:center;
+  /* action bar sits OUTSIDE the card so the card stays clean for screenshots */
+  .actions{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
     margin-top:14px;
+  }
+  .actions .hint{
+    flex:1;
+    text-align:center;
+    margin:0;
     font-family:'Zen Kaku Gothic New', 'Noto Sans SC', sans-serif;
     font-size:11.5px;
     color:var(--ink-faded);
   }
+  .act{
+    -webkit-appearance:none;
+    appearance:none;
+    background:none;
+    border:none;
+    padding:6px;
+    margin:0;
+    cursor:pointer;
+    color:var(--ink-faded);
+    font-family:'Courier Prime', 'Zen Kaku Gothic New', 'Noto Sans SC', monospace;
+    font-size:10.5px;
+    letter-spacing:0.14em;
+    line-height:1;
+    display:inline-flex;
+    align-items:center;
+    transition:color .15s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .act:hover, .act:focus-visible{ color:var(--ink); outline:none; }
+  .act:active{ opacity:.5; }
+  .act svg{ width:19px; height:19px; display:block; }
+  .act-share{ margin-left:-6px; }
+  .act-clear{ margin-right:-6px; white-space:nowrap; }
+
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:26px;
+    transform:translateX(-50%) translateY(8px);
+    background:rgba(56,61,64,0.94);
+    color:#F4F5F4;
+    font-family:'Courier Prime', 'Zen Kaku Gothic New', 'Noto Sans SC', monospace;
+    font-size:12px;
+    letter-spacing:0.08em;
+    padding:9px 16px;
+    border-radius:3px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
@@ -265,7 +314,7 @@
     </div>
 
     <div class="byline">
-      <span class="tea-name" id="teaName" contenteditable="true"></span><span class="at-group" id="atGroup"><span class="at-symbol" contenteditable="false">@</span><span class="location" id="location" contenteditable="true">somewhere</span></span>
+      <span class="tea-name" id="teaName" contenteditable="true"></span><span class="at-group" id="atGroup"><span class="at-symbol" contenteditable="false">@</span><span class="location" id="teaLocation" contenteditable="true">somewhere</span></span>
     </div>
 
     <div class="photo-wrap" id="photoWrap">
@@ -286,22 +335,30 @@
     <div class="field-row">
       <div class="field">
         <span class="label">Type</span>
-        <div class="value" contenteditable="true" data-ph=""></div>
+        <div class="value" id="typeField" contenteditable="true" data-ph=""></div>
       </div>
       <div class="field">
         <span class="label">Origin</span>
-        <div class="value" contenteditable="true" data-ph=""></div>
+        <div class="value" id="originField" contenteditable="true" data-ph=""></div>
       </div>
     </div>
 
     <div class="memo">
       <span class="label">Taste note</span>
-      <div class="value" contenteditable="true" data-ph="aroma, body, aftertaste..."></div>
+      <div class="value" id="noteField" contenteditable="true" data-ph="aroma, body, aftertaste..."></div>
     </div>
   </div>
 
-  <div class="hint">tap any field to edit</div>
+  <div class="actions">
+    <button type="button" class="act act-share" id="shareBtn" aria-label="Share this ticket" title="Share">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15.5V3.2"/><path d="M8 7.2l4-4 4 4"/><path d="M4.2 13v6a2 2 0 0 0 2 2h11.6a2 2 0 0 0 2-2v-6"/></svg>
+    </button>
+    <div class="hint">tap any field to edit</div>
+    <button type="button" class="act act-clear" id="clearBtn">CLEAR ALL</button>
+  </div>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script>
   // photo upload + finger pan/pinch-zoom (no visible controls, screenshot-friendly)
@@ -317,12 +374,29 @@
   let moved = false;
   let startX = 0, startY = 0, startPanX = 0, startPanY = 0;
   let pinchStartDist = 0, pinchStartZoom = 1;
+  let natW = 0, natH = 0, baseScale = 1;
+
+  // Size the image to *cover* the frame at its own aspect ratio, rather than
+  // squashing it into a 100%x100% box. This is what makes sliding work at the
+  // default zoom: a non-square photo genuinely overflows the square frame, so
+  // there is real slack to drag through when choosing the crop.
+  function layoutImage(){
+    const frame = photoInner.getBoundingClientRect();
+    if(!natW || !natH || !frame.width) return;
+    baseScale = Math.max(frame.width / natW, frame.height / natH);
+    photoImg.style.width  = (natW * baseScale) + 'px';
+    photoImg.style.height = (natH * baseScale) + 'px';
+    applyTransform();
+  }
 
   function clampPan(){
     const frame = photoInner.getBoundingClientRect();
-    const maxOffset = (frame.width * (zoom - 1)) / 2;
-    panX = Math.max(-maxOffset, Math.min(maxOffset, panX));
-    panY = Math.max(-maxOffset, Math.min(maxOffset, panY));
+    const w = natW * baseScale * zoom;
+    const h = natH * baseScale * zoom;
+    const maxX = Math.max(0, (w - frame.width) / 2);
+    const maxY = Math.max(0, (h - frame.height) / 2);
+    panX = Math.max(-maxX, Math.min(maxX, panX));
+    panY = Math.max(-maxY, Math.min(maxY, panY));
   }
 
   function applyTransform(){
@@ -332,6 +406,15 @@
 
   function openPicker(){ photoInput.click(); }
 
+  photoImg.addEventListener('load', () => {
+    natW = photoImg.naturalWidth;
+    natH = photoImg.naturalHeight;
+    zoom = 1; panX = 0; panY = 0;
+    layoutImage();
+  });
+
+  window.addEventListener('resize', layoutImage);
+
   photoInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if(!file) return;
@@ -340,8 +423,6 @@
       photoImg.src = ev.target.result;
       photoSlot.classList.add('has-image');
       photoWrap.classList.add('has-image');
-      zoom = 1; panX = 0; panY = 0;
-      applyTransform();
     };
     reader.readAsDataURL(file);
   });
@@ -424,11 +505,78 @@
 
   // default date
   const dateField = document.getElementById('dateField');
-  const today = new Date();
-  const y = today.getFullYear();
-  const m = String(today.getMonth()+1).padStart(2,'0');
-  const d = String(today.getDate()).padStart(2,'0');
-  dateField.textContent = `${y}.${m}.${d}`;
+  function todayStamp(){
+    const t = new Date();
+    const y = t.getFullYear();
+    const m = String(t.getMonth()+1).padStart(2,'0');
+    const d = String(t.getDate()).padStart(2,'0');
+    return `${y}.${m}.${d}`;
+  }
+  dateField.textContent = todayStamp();
+
+  // ---- share + clear ----
+  const teaLocation = document.getElementById('teaLocation');
+  const typeField   = document.getElementById('typeField');
+  const originField = document.getElementById('originField');
+  const noteField   = document.getElementById('noteField');
+  const toast       = document.getElementById('toast');
+
+  let toastTimer;
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  function ticketText(){
+    const val = (el) => el.textContent.trim();
+    const tea = val(teaName), loc = val(teaLocation);
+    const lines = [`TODAY'S CUP  ${val(dateField)}`];
+    if(tea) lines.push(loc ? `${tea} @ ${loc}` : tea);
+    if(val(typeField))   lines.push(`Type: ${val(typeField)}`);
+    if(val(originField)) lines.push(`Origin: ${val(originField)}`);
+    if(val(noteField))   lines.push(`Taste note: ${val(noteField)}`);
+    return lines.join('\n');
+  }
+
+  document.getElementById('shareBtn').addEventListener('click', async () => {
+    const data = { title: "Today's Cup", text: ticketText(), url: window.location.href };
+    if(navigator.share){
+      try { await navigator.share(data); }
+      catch(err){ if(err && err.name !== 'AbortError') showToast('could not share'); }
+      return;
+    }
+    // desktop / unsupported browsers: fall back to the clipboard
+    const payload = `${data.text}\n${data.url}`;
+    try {
+      await navigator.clipboard.writeText(payload);
+      showToast('copied to clipboard');
+    } catch(err){
+      showToast('sharing not supported');
+    }
+  });
+
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    if(!confirm('Clear this ticket?')) return;
+    teaName.textContent = '';
+    teaLocation.textContent = 'somewhere';
+    typeField.textContent = '';
+    originField.textContent = '';
+    noteField.textContent = '';
+    dateField.textContent = todayStamp();
+
+    photoImg.removeAttribute('src');
+    photoImg.style.width = '';
+    photoImg.style.height = '';
+    photoSlot.classList.remove('has-image');
+    photoWrap.classList.remove('has-image');
+    photoInput.value = '';
+    natW = natH = 0; baseScale = 1;
+    zoom = 1; panX = 0; panY = 0;
+
+    syncByline();
+  });
 </script>
 
 </body>
