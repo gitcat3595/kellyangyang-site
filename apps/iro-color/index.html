@@ -31,6 +31,11 @@
   --shadow:0 24px 60px -20px rgba(0,0,0,.8);
 
   /* one radius scale, used everywhere */
+  /* cold-press cotton rag: a coarse tooth plus a fine grain, both lit from
+     the top left so the bumps have a consistent direction */
+  --paper-tooth:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='p' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.022' numOctaves='4' seed='3' result='t'/><feDiffuseLighting in='t' lighting-color='%23ffffff' surfaceScale='1.6' result='l'><feDistantLight azimuth='225' elevation='48'/></feDiffuseLighting><feComponentTransfer in='l'><feFuncR type='linear' slope='1' intercept='-0.243'/><feFuncG type='linear' slope='1' intercept='-0.243'/><feFuncB type='linear' slope='1' intercept='-0.243'/></feComponentTransfer></filter><rect width='320' height='320' filter='url(%23p)'/></svg>");
+  --paper-grain:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='110' height='110'><filter id='g' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' seed='11' result='t'/><feDiffuseLighting in='t' lighting-color='%23ffffff' surfaceScale='0.6' result='l'><feDistantLight azimuth='225' elevation='55'/></feDiffuseLighting><feComponentTransfer in='l'><feFuncR type='linear' slope='1' intercept='-0.319'/><feFuncG type='linear' slope='1' intercept='-0.319'/><feFuncB type='linear' slope='1' intercept='-0.319'/></feComponentTransfer></filter><rect width='110' height='110' filter='url(%23g)'/></svg>");
+
   --r-tile:4px;
   --r-ui:6px;
   --r-card:14px;
@@ -136,6 +141,61 @@ body{
 [data-theme="light"] .icon-btn .ico-sun{display:block}
 [data-theme="dark"] .icon-btn .ico-moon{display:block}
 
+/* ---------- menu ---------- */
+.menu-wrap{position:relative}
+.menu{
+  position:absolute;top:calc(100% + 8px);right:0;z-index:60;
+  min-width:180px;padding:6px;
+  background:var(--bg);border:1px solid var(--line);border-radius:10px;
+  box-shadow:var(--shadow);
+  display:none;
+}
+.menu.open{display:block}
+.menu button{
+  display:block;width:100%;text-align:left;
+  padding:10px 12px;border:0;border-radius:6px;background:transparent;
+  color:var(--fg-2);cursor:pointer;font-family:var(--sans);font-size:14px;
+  transition:background-color .12s,color .12s;
+}
+.menu button:hover{background:var(--surface);color:var(--fg)}
+.menu button[aria-current="true"]{color:var(--fg);font-weight:560}
+.menu-rule{height:1px;background:var(--line);margin:6px 4px}
+
+/* ---------- guide ---------- */
+.guide-head{padding:56px 0 8px}
+.guide-sec{margin-top:40px}
+.guide-sec h3{
+  font-size:clamp(18px,3.2vw,21px);font-weight:600;letter-spacing:-.015em;
+  padding-bottom:10px;margin-bottom:14px;border-bottom:1px solid var(--line);
+}
+[data-lang="ja"] .guide-sec h3{letter-spacing:.05em}
+.guide-sec p{font-size:15px;line-height:1.75;color:var(--fg-2);max-width:64ch}
+[data-lang="ja"] .guide-sec p{line-height:1.95}
+.guide-sec p + p{margin-top:12px}
+
+.hue-list{display:grid;gap:2px;margin-top:6px}
+.hue{
+  display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;
+  padding:16px 0;border-bottom:1px solid var(--line);
+}
+.hue-chip{
+  width:34px;height:34px;border-radius:var(--r-tile);
+  background:var(--c);box-shadow:inset 0 0 0 1px var(--line);
+  background-image:var(--paper-tooth);background-size:120px 120px;
+  background-blend-mode:soft-light;
+}
+.hue-name{font-size:14px;font-weight:600;margin-bottom:6px}
+.hue-body{font-size:14px;line-height:1.75;color:var(--fg-2)}
+[data-lang="ja"] .hue-body{line-height:1.95}
+
+.ref-list{list-style:none;display:grid;gap:8px;margin-top:4px}
+.ref-list a{
+  font-size:13px;color:var(--fg-2);text-decoration:none;word-break:break-all;
+  border-bottom:1px solid var(--line);padding-bottom:2px;
+}
+.ref-list a:hover{color:var(--fg);border-color:var(--fg-3)}
+.guide-note{font-size:13px;line-height:1.7;color:var(--fg-3);margin-top:10px;max-width:64ch}
+
 /* ---------- headings ---------- */
 .h1{
   font-size:clamp(30px,7vw,46px);
@@ -145,6 +205,9 @@ body{
   text-wrap:balance;
 }
 .h2{font-size:clamp(22px,4.4vw,28px);font-weight:600;letter-spacing:-.02em;line-height:1.15}
+/* Japanese has no word spaces, so it wants tracking where Latin wants none */
+[data-lang="ja"] .h1{letter-spacing:.12em;line-height:1.24}
+[data-lang="ja"] .h2{letter-spacing:.06em}
 .lede{font-size:15px;color:var(--fg-2);line-height:1.6;max-width:42ch}
 
 .section{margin-top:44px}
@@ -196,12 +259,18 @@ body{
   content:"";position:absolute;inset:-3px;border-radius:calc(var(--r-tile) + 3px);
   border:1.5px solid transparent;transition:border-color .15s ease;pointer-events:none;
 }
+/* Hover lifts the chip off the sheet with shadow alone — no ring, which read
+   as a hard black edge in light mode. The ring is kept for keyboard focus,
+   where an unmistakable outline matters more than the effect. */
 .swatch:hover,.swatch:focus-visible{
-  transform:translateY(-2px);
-  box-shadow:inset 0 0 0 1px var(--line),0 8px 18px -6px rgba(0,0,0,.55);
+  transform:translateY(-3px) scale(1.02);
+  box-shadow:
+    inset 0 0 0 1px var(--line),
+    0 2px 4px -1px rgba(0,0,0,.28),
+    0 10px 22px -6px rgba(0,0,0,.45);
   z-index:2;
 }
-.swatch:hover::after,.swatch:focus-visible::after{border-color:var(--ring)}
+.swatch:focus-visible::after{border-color:var(--ring)}
 .swatch:focus-visible{outline:none}
 .swatch:active{transform:translateY(0) scale(.97)}
 
@@ -232,14 +301,14 @@ body{
   border-radius:var(--r-card);
   background:var(--c,#333);
   box-shadow:inset 0 0 0 1px var(--line);
-  padding:22px;
+  padding:22px 22px 40px;
   display:flex;flex-direction:column;justify-content:space-between;
   overflow:hidden;
   color:#fff;                     /* names are always white, as in v11 */
 }
 .swatch-card.size-hero{aspect-ratio:4/3}
 @media (min-width:640px){.swatch-card.size-hero{aspect-ratio:16/9}}
-.swatch-card.size-sm{aspect-ratio:16/9;padding:18px;border-radius:12px}
+.swatch-card.size-sm{aspect-ratio:16/9;padding:18px 18px 30px;border-radius:12px}
 .swatch-card.size-xs{height:76px;padding:14px;border-radius:10px}
 
 /* Cotton-rag watercolour paper: a cold-press tooth raised by a distant light
@@ -256,12 +325,24 @@ body{
       rgba(255,255,255,0)   46%,
       rgba(0,0,0,.06)       72%,
       rgba(0,0,0,.15)       100%),
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='p' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.042' numOctaves='5' seed='3' result='t'/><feDiffuseLighting in='t' lighting-color='%23ffffff' surfaceScale='2.4' result='l'><feDistantLight azimuth='225' elevation='58'/></feDiffuseLighting></filter><rect width='300' height='300' filter='url(%23p)'/></svg>"),
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='g' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' seed='11' result='t'/><feDiffuseLighting in='t' lighting-color='%23ffffff' surfaceScale='1' result='l'><feDistantLight azimuth='225' elevation='62'/></feDiffuseLighting></filter><rect width='120' height='120' filter='url(%23g)'/></svg>");
-  background-size: auto, 300px 300px, 120px 120px;
+    var(--paper-tooth),
+    var(--paper-grain);
+  background-size: auto, 320px 320px, 110px 110px;
   background-blend-mode: normal, soft-light, soft-light;
   mix-blend-mode: soft-light;
-  opacity:.78;
+  opacity:.42;
+}
+
+/* the same sheet of paper under the palette wall */
+.swatch::before{
+  content:"";
+  position:absolute; inset:0; pointer-events:none;
+  border-radius:inherit;
+  background-image: var(--paper-tooth), var(--paper-grain);
+  background-size: 160px 160px, 60px 60px;
+  background-blend-mode: soft-light;
+  mix-blend-mode: soft-light;
+  opacity:.3;
 }
 .swatch-card > *{position:relative;z-index:1}
 
@@ -274,17 +355,19 @@ body{
 }
 .sc-jp{
   font-size:clamp(38px,11vw,68px);
-  font-weight:600;letter-spacing:-.02em;line-height:.98;
+  font-weight:600;letter-spacing:.16em;line-height:1.16;
+  /* letter-spacing adds a trailing gap; pull it back so the name stays flush */
+  margin-right:-.16em;
   text-shadow:var(--lift,0 1px 8px rgba(0,0,0,.35));
 }
 .swatch-card.size-sm .sc-jp{font-size:clamp(26px,7vw,36px)}
 .swatch-card.size-xs .sc-jp{font-size:22px}
 .sc-romaji{
   font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
-  opacity:.95;margin-top:7px;font-weight:500;
+  opacity:.95;margin-top:16px;font-weight:500;
   text-shadow:var(--lift,0 1px 6px rgba(0,0,0,.4));
 }
-.swatch-card.size-xs .sc-romaji{font-size:10px;margin-top:3px}
+.swatch-card.size-xs .sc-romaji{font-size:10px;margin-top:6px}
 .sc-mood{
   font-family:var(--mono);font-size:10px;letter-spacing:.08em;
   opacity:.85;margin-top:10px;line-height:1.6;max-width:36ch;text-transform:uppercase;
@@ -385,7 +468,7 @@ body{
    ============================================================ */
 .cal-head{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
-  margin-bottom:20px;flex-wrap:wrap;
+  margin-bottom:30px;flex-wrap:wrap;
 }
 /* capped so a day tile lands at the same ~85px as a palette tile —
    the two grids are meant to read as one component */
@@ -405,8 +488,8 @@ body{
   border-radius:var(--r-tile);
   background:var(--c,var(--surface));
   box-shadow:inset 0 0 0 1px var(--line);
-  border:0;padding:5px 0 0 6px;
-  display:block;text-align:left;
+  border:0;padding:0;
+  display:grid;place-items:center;text-align:center;
   cursor:pointer;color:var(--fg-3);
   font-family:var(--mono);font-size:10px;letter-spacing:.02em;font-weight:500;
   transition:transform .18s cubic-bezier(.22,1,.36,1),box-shadow .18s ease;
@@ -499,6 +582,19 @@ body{
       </button>
       <button class="icon-btn" id="langBtn" onclick="toggleLang()" aria-label="Switch language">EN</button>
       <button class="icon-btn" onclick="goCalendar()" data-i18n="nav.journal">Journal</button>
+      <span class="menu-wrap">
+        <button class="icon-btn" id="menuBtn" aria-haspopup="true" aria-expanded="false" aria-label="Menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16"/>
+          </svg>
+        </button>
+        <div class="menu" id="menu" role="menu">
+          <button role="menuitem" onclick="menuGo('top')"      data-i18n="nav.palette">Palette</button>
+          <button role="menuitem" onclick="menuGo('calendar')" data-i18n="nav.journal">Journal</button>
+          <div class="menu-rule"></div>
+          <button role="menuitem" onclick="menuGo('guide')"    data-i18n="nav.guide">Guide</button>
+        </div>
+      </span>
     </div>
   </div>
 </header>
@@ -521,7 +617,7 @@ body{
     </div>
 
     <div class="foot" style="margin-top:44px">
-      <span>IRO</span><span data-i18n="top.foot">60 traditional Japanese colours</span>
+      <span class="copy"></span><span data-i18n="top.foot">60 traditional Japanese colours</span>
     </div>
   </div>
 </main>
@@ -565,7 +661,7 @@ body{
       <button class="btn btn-primary" onclick="goJournal()" data-i18n="btn.save">Save to journal</button>
     </div>
 
-    <div class="foot"><span>IRO</span><span id="footHex"></span></div>
+    <div class="foot"><span class="copy"></span><span id="footHex"></span></div>
   </div>
 </main>
 
@@ -603,7 +699,7 @@ body{
       <button class="btn btn-primary" onclick="saveEntry()" data-i18n="btn.saveEntry">Save entry</button>
     </div>
 
-    <div class="foot"><span>IRO</span><span data-i18n="foot.local">Stored on this device</span></div>
+    <div class="foot"><span class="copy"></span><span data-i18n="foot.local">Stored on this device</span></div>
   </div>
 </main>
 
@@ -630,18 +726,18 @@ body{
       <button class="btn btn-primary" onclick="goCalendar()" data-i18n="btn.viewJournal">View journal</button>
     </div>
 
-    <div class="foot"><span>IRO</span><span data-i18n="foot.local">Stored on this device</span></div>
+    <div class="foot"><span class="copy"></span><span data-i18n="foot.local">Stored on this device</span></div>
   </div>
 </main>
 
 <!-- ===================== CALENDAR ===================== -->
 <main class="page" id="page-calendar">
   <div class="wrap">
-    <div style="padding:20px 0 16px"><button class="back" onclick="goTop()">← Palette</button></div>
+    <div style="padding:20px 0 32px"><button class="back" onclick="goTop()" data-i18n="back.palette">← Palette</button></div>
 
     <div class="cal-head">
       <div>
-        <span class="eyebrow" style="display:block;margin-bottom:6px" data-i18n="cal.eyebrow">Journal</span>
+        <span class="eyebrow" style="display:block;margin-bottom:9px" data-i18n="cal.eyebrow">Journal</span>
         <h2 class="h2" id="calMonth"></h2>
       </div>
       <div style="display:flex;gap:6px">
@@ -659,7 +755,20 @@ body{
       <span data-i18n="cal.hint">Tap a day to record</span>
     </div>
 
-    <div class="foot"><span>IRO</span><span data-i18n="foot.local">Stored on this device</span></div>
+    <div class="foot"><span class="copy"></span><span data-i18n="foot.local">Stored on this device</span></div>
+  </div>
+</main>
+
+<!-- ===================== GUIDE ===================== -->
+<main class="page" id="page-guide">
+  <div class="wrap">
+    <div style="padding:20px 0 0"><button class="back" onclick="goTop()" data-i18n="back.palette">← Palette</button></div>
+    <div class="guide-head">
+      <span class="eyebrow" data-i18n="nav.guide" style="display:block;margin-bottom:12px">Guide</span>
+      <h1 class="h1" id="guideTitle"></h1>
+    </div>
+    <div id="guideBody"></div>
+    <div class="foot"><span id="footGuide"></span><span data-i18n="foot.local">Stored on this device</span></div>
   </div>
 </main>
 
@@ -755,6 +864,192 @@ const colorData = [
   { name: '呂色', romaji: 'Ro-iro', kanji: 'Ro (polished lacquer) - iro (colour)', hex: '#0C0C0C', mood: ['absolute', 'finished', 'exacting', 'depthless', 'quiet'], psych: 'Deep black suggests stillness and refinement. Ro-iro adds a sense of finish and assured presence. If this colour feels good to you, that response is useful information too. Let the space, stability, and definition of neutral and dark tones guide you, then find the amount and distance that suit you.', origin: 'The mirror-black of ro-iro lacquerware, built from many coats and polished with charcoal and deer horn until the surface shows no brush mark at all. In Japanese colour tradition, cloth, metal, ash, charcoal, and lacquer became both a visual reference and a carrier of season and culture. Its appearance shifts across media, so enjoy it as a spread of closely related tones rather than a single hard definition.', kanjiJa: '呂色（ろいろ）＝ 磨き上げた漆の黒', moodJa: ['絶対', '仕上がり', '厳密', '底知れぬ', '静か'], psychJa: '深い黒は、静けさと洗練を感じさせる色。呂色は、仕上げの美しさや確かな存在感を添えます。 この色を見て心地よいと感じるなら、その感覚も大切な情報です。無彩色・深い中間色の余白、安定、輪郭を借りながら、自分に合う距離感と量を探してみましょう。', originJa: '呂色塗りの漆器の、鏡のような黒。幾度も塗り重ね、炭と鹿角の粉で刷毛目が消えるまで磨き上げます。 日本の伝統色では布、金属、灰、炭、漆が、色の手がかりであると同時に季節や文化を運ぶ言葉になりました。この色も媒体によって見え方が変わるため、ひとつの定義ではなく、近い色調の広がりとして楽しめます。' }
 ];
 
+// ===== guide content (bilingual) =====
+var GUIDE = {
+ "sections": [
+  {
+   "title": {
+    "ja": "このサイトについて",
+    "en": "About the app"
+   },
+   "ja": [
+    "IRO - COLOR JOURNALは、日本の伝統色を手がかりに、今日の気分を言葉と色で見つめるための小さな色見本です。60色それぞれに、色名の背景、英日対訳、そして色彩心理でよく語られる印象を添えています。伝統色は一つの厳密な数値ではなく、自然、染料、季節、使われた場面から生まれた幅のある色合いです。このサイトでは、正解を決めるためではなく、自分の感覚に近い色を探すために使ってください。"
+   ],
+   "en": [
+    "IRO COLOR is a small colour atlas for noticing today’s mood through Japanese traditional colours. Each of the 60 entries brings together the colour name, its cultural background, bilingual wording, and commonly discussed colour-psychology associations. Traditional colour names do not point to one perfectly fixed value; they describe a range shaped by nature, dyes, seasons, and use. Use the site to find a colour that feels close to your experience—not to look for a single correct answer."
+   ]
+  },
+  {
+   "title": {
+    "ja": "色彩心理とは",
+    "en": "What is Color Psychology"
+   },
+   "ja": [
+    "色彩心理は、色が注意、印象、選択、気分とどう結びつきやすいかを考えるための枠組みです。たとえば明るい黄は目に入りやすく、深い青は落ち着きや信頼と結びつけて語られることがあります。ただし、色が人の感情を一律に決めるわけではありません。文化、記憶、光、周囲の色、個人の好みが重なって受け取り方は変わります。ここでは「〜と感じやすい」という控えめな手がかりとして扱います。"
+   ],
+   "en": [
+    "Colour psychology is a framework for thinking about how colour can relate to attention, impressions, choices, and mood. Bright yellow, for example, is easy to notice; deep blue is often associated with calm and trust. But colour does not determine emotions in the same way for everyone. Culture, memory, light, surrounding colours, and personal taste all shape the response. In this guide, these associations are offered as gentle cues—things people may be more likely to feel, not universal facts."
+   ]
+  },
+  {
+   "title": {
+    "ja": "色の効果と使い方",
+    "en": "Using color with intention"
+   },
+   "ja": [
+    "色は、気分をつくることも、今の気分を映すこともできます。マーケティングでは、目を引く赤や黄を行動を促す場面に、信頼感のある青をサービスや情報の場面に使う例が多く見られます。インテリアでは、穏やかな青緑や低彩度の中間色が休息の背景になり、暖色は会話やぬくもりを添えます。服や配色では、主役の色を一つ決め、白・灰・茶などの中立色で支えると、色の意味が読み取りやすくなります。"
+   ],
+   "en": [
+    "Colour can help create a mood and can also reflect the one you already have. In marketing, attention-grabbing red or yellow is often used around action, while dependable blue often appears in service and information settings. In interiors, calm blue-greens and low-saturation neutrals can support rest, whereas warm hues add conversation and warmth. For clothing and palettes, choose one leading colour, then support it with neutrals such as white, grey, or brown so its character can be read more clearly."
+   ]
+  },
+  {
+   "title": {
+    "ja": "色ログの使い方",
+    "en": "Log your mood"
+   },
+   "ja": [
+    "その日の気分にいちばん近い色を一つ選んでください。毎日の色を記録するこで、週や月の単位で色の傾向やパターンが見えるかもしれません。それぞれの色の意味やイメージと照らし合わせて今の気分と向き合うきっけにしてみてください。これは診断ではなく、自分のリズムや環境との関係に気づくための、やさしい観察の習慣です。"
+   ],
+   "en": [
+    "Choose the colour that feels closest to your mood that day. By recording a colour each day, you may begin to notice trends and patterns over weeks or months. Use each colour’s meanings and associations as a prompt to reflect on how you are feeling right now. This is not a diagnostic tool, but a gentle practice for noticing your own rhythms and relationship with your surroundings."
+   ]
+  },
+  {
+   "title": {
+    "ja": "使う時の注意",
+    "en": "A useful reminder"
+   },
+   "ja": [
+    "色の印象は文化によって異なり、同じ色でも場面によって意味が変わります。特にブランド、公共空間、医療や安全に関わる表示では、対象となる人や文脈、読みやすさ、十分なコントラストを必ず考えてください。色だけに意味を任せず、言葉、形、余白、記号も組み合わせることが、伝わりやすいデザインにつながります。"
+   ],
+   "en": [
+    "Colour meanings vary across cultures, and the same hue changes meaning with context. For brands, public spaces, and especially health- or safety-related information, always consider the audience, context, readability, and sufficient contrast. Do not rely on colour alone; combine it with words, form, spacing, and symbols for communication people can understand."
+   ]
+  }
+ ],
+ "colours": [
+  {
+   "ja": "赤",
+   "en": "Red",
+   "hex": "#D7003A",
+   "bodyJa": "赤は、高い覚醒度をともなう色として見られやすく、愛・情熱・喜びのような前向きな強さと、怒り・危険・緊張のような否定的な強さの両方に結びつけられます。つまり、赤は「元気」だけではなく、感情が大きく動いている時の色として感じられやすい色です。",
+   "bodyEn": "Red is commonly associated with high arousal: empowering feelings such as love, passion, and joy, but also anger, danger, and tension. In other words, it is not simply an ‘energetic’ colour—it often feels like a colour for emotions that are moving strongly in either direction."
+  },
+  {
+   "ja": "橙",
+   "en": "Orange",
+   "hex": "#EE7800",
+   "bodyJa": "橙は、喜び、楽しさ、快さ、わくわく感のような、前向きで活発な感情と結びつけられやすい色です。黄に近い明るさと赤に近いあたたかさを持つため、心が外へ開いている時や、人とのつながりを楽しみたい時の気分を表しやすいと考えられます。",
+   "bodyEn": "Orange is often linked with positive, active feelings such as joy, fun, pleasure, and excitement. Its yellow-like brightness and red-like warmth can make it a useful way to describe an outward-looking mood or the wish to enjoy connection with other people."
+  },
+  {
+   "ja": "黄",
+   "en": "Yellow",
+   "hex": "#FFD900",
+   "bodyJa": "黄は、喜び、希望、好奇心、驚きといった、明るく覚醒度の高い感情と結びつけられることが多い色です。その一方で、強い明るさは注意や緊張も呼びやすいため、晴れやかさと落ち着かなさの両方を含むことがあります。",
+   "bodyEn": "Yellow is frequently associated with bright, high-arousal feelings such as joy, hope, curiosity, and surprise. Its intensity can also invite attention or tension, so it may carry both sunniness and a slight sense of restlessness."
+  },
+  {
+   "ja": "緑",
+   "en": "Green",
+   "hex": "#007B43",
+   "bodyJa": "緑は、安心、快適さ、リラックス、満足感といった、前向きで覚醒度の低い感情と結びつけられやすい色です。ただし、文化や言葉の影響で、嫉妬や羨望のような感情が連想されることもあります。静かに整いたい時の色でもあり、複雑な気持ちを含む色でもあります。",
+   "bodyEn": "Green is often associated with positive, low-arousal feelings such as comfort, relaxation, contentment, and reassurance. Yet culture and language can also connect it with envy or jealousy. It can be a colour for quietly settling, while still holding more complicated feelings."
+  },
+  {
+   "ja": "青",
+   "en": "Blue",
+   "hex": "#0095D9",
+   "bodyJa": "青は、静けさ、安心、信頼、リラックスといった、覚醒度の低い前向きな感情と結びつけられることが多い色です。同時に「blue」という言い回しのように、悲しさや距離感を連想する人もいます。落ち着きたい時にも、少し内側を見つめている時にも選ばれやすい色です。",
+   "bodyEn": "Blue is commonly associated with low-arousal positive feelings such as calm, reassurance, trust, and relaxation. At the same time, expressions such as ‘feeling blue’ connect it with sadness or distance for many people. It can suit both the wish to settle and a more inward-looking mood."
+  },
+  {
+   "ja": "藍",
+   "en": "Indigo",
+   "hex": "#165E83",
+   "bodyJa": "藍は研究で独立した基本色として扱われることは多くありませんが、深い青に近い色として、静けさに重みや内省を加えた印象を持たれやすい色です。明るい青よりも、考え込む時間、深い集中、控えめな強さに近い気分を映すことがあります。",
+   "bodyEn": "Indigo is not often studied as a separate basic colour category, but as a deep blue it often feels like calm with more weight and reflection. Compared with light blue, it may better express contemplation, sustained focus, or a restrained kind of strength."
+  },
+  {
+   "ja": "紫",
+   "en": "Violet",
+   "hex": "#745399",
+   "bodyJa": "紫は、誇り、力、個性、想像力のような「自分らしさ」を感じる感情と結びつけられることがあります。一方で、落ち着き、愛、少しの不安や神秘性まで幅広い連想を持つため、ひとつの気分に決めにくい、複雑で個人的な色でもあります。",
+   "bodyEn": "Violet is sometimes associated with pride, power, individuality, and imagination—feelings that carry a sense of self. It can also evoke calm, love, uncertainty, or mystery, making it a complex and highly personal colour rather than one with a single mood."
+  },
+  {
+   "ja": "白",
+   "en": "White",
+   "hex": "#FFFFFF",
+   "bodyJa": "白は、安心、解放感、希望、静かな喜びといった、前向きで覚醒度の低い感情と結びつけられやすい色です。何もない空白にも、新しく始められる余地にも見えるため、気持ちを整えたい時や、少し軽くなりたい時のイメージになります。",
+   "bodyEn": "White is often associated with positive, low-arousal feelings such as relief, hope, quiet happiness, and openness. Because it can look like both empty space and room to begin again, it may suit the wish to reset or feel a little lighter."
+  },
+  {
+   "ja": "灰",
+   "en": "Grey",
+   "hex": "#727171",
+   "bodyJa": "灰は、中立に見える一方で、研究では退屈、疲れ、がっかり、弱さ、低いエネルギーのような感情と結びつけられることが少なくありません。派手な感情ではないけれど、気分が曖昧な時、距離を置きたい時、静かに回復を待つ時の色として捉えることもできます。",
+   "bodyEn": "Grey may look neutral, but research often links it with boredom, tiredness, disappointment, weakness, and low energy. It is not a dramatic feeling; it can describe an ambiguous mood, the wish for distance, or a quiet period of waiting to recover."
+  },
+  {
+   "ja": "茶",
+   "en": "Brown",
+   "hex": "#8C6449",
+   "bodyJa": "茶は、暖かさや親しみを感じる人がいる一方で、研究では低い覚醒度の否定的な感情、退屈、悲しさ、重さと結びつくこともあります。土や木を思わせるため、にぎやかさよりも、日常、現実感、少し疲れた静けさを表すことがあります。",
+   "bodyEn": "Brown can feel warm and familiar to some people, yet research also links it with low-arousal negative feelings such as boredom, sadness, and heaviness. Its connection with earth and wood may express everyday reality, groundedness, or a slightly tired quiet rather than excitement."
+  },
+  {
+   "ja": "黒",
+   "en": "Black",
+   "hex": "#0C0C0C",
+   "bodyJa": "黒は、恐れ、怒り、悲しみ、緊張のような強く否定的な感情と結びつけられやすい一方で、力や支配感とも関連づけられます。暗さゆえに、守りたい、距離を置きたい、強くありたいという気持ちまで含めて表せる色です。",
+   "bodyEn": "Black is often associated with strongly negative emotions such as fear, anger, sadness, and tension, while also carrying ideas of power and dominance. Its darkness can express the wish to protect yourself, create distance, or feel strong."
+  }
+ ],
+ "refs": [
+  "https://irocore.com/",
+  "https://naisouzairyou-annai.jp/color/tradition/index.html",
+  "https://www.adobe.com/jp/creativecloud/design/discover/color-meaning.html",
+  "https://blog.btrax.com/jp/color/",
+  "https://pmc.ncbi.nlm.nih.gov/articles/PMC12325498/"
+ ],
+ "story": {
+  "title": {
+   "ja": "アプリのストーリー",
+   "en": "Story behind the app"
+  },
+  "ja": [
+   "このアプリは、子どもの頃から色に強く惹かれてきたつくり手の個人的な記憶から生まれました。幼稚園で水色の大きなチェックのスモックを探し、中学生で自分の部屋の壁紙えらび、その色が部屋全体を安心できる場所に変えることを実感したこと。そして、高校では色彩心理を調べてから、色が気分や周囲の空気にどう働くのかを考えてからは色を意識して生活に取り入れるようになりました。",
+   "IRO—COLOR JOURNALは、色に親しみ、自分を静かに見つめるための色日記アプリです。その日に惹かれる色を選び、色名やイメージを手がかりに、実際の気持ちを見つめ直します。続けることで、気分の変化、繰り返し選ぶ色、季節や出来事とのつながりが見えてくるかもしれません。日本の60の伝統色を入口に、色の力を毎日の暮らしに取り入れて楽しんでもらえたらうれしいです。"
+  ],
+  "en": [
+   "This app grew from its creator’s personal memories of being drawn to color from an early age. As a child, she searched for a sky-blue smock with large checks; later, when choosing the wallpaper for her own room in junior high school, she experienced how color could turn an entire space into somewhere calm and comforting. After studying color psychology in high school, she began to notice how color can shape mood and atmosphere, and to bring it more consciously into everyday life.",
+   "IRO—COLOR JOURNAL is a color-journal app for enjoying color and quietly reflecting on yourself. Choose the color you feel drawn to each day, then use its name and associations as a prompt to revisit what you are really feeling. Over time, you may begin to see changes in mood, colors you repeatedly choose, or connections with seasons and events. Through 60 Japanese traditional colors, I hope you will enjoy bringing the power of color into your daily life."
+  ]
+ },
+ "note": {
+  "ja": "下記の主要色の心理的な見え方は、btraxの色彩と行動に関する解説も参照し、文化差・個人差を前提に要約しています。",
+  "en": "The following major-colour notes are informed in part by btrax’s discussion of colour and behaviour, and are summarised with cultural and individual differences in mind."
+ },
+ "heading": {
+  "ja": "色と気分のガイド",
+  "en": "A Guide to Colour and Mood"
+ },
+ "coloursHeading": {
+  "ja": "主な色の見え方",
+  "en": "Major colour associations"
+ },
+ "aboutHeading": {
+  "ja": "アプリについて",
+  "en": "About IRO"
+ },
+ "refsHeading": {
+  "ja": "参考",
+  "en": "References"
+ }
+};
+
 /* ============================================================
    colour maths — drives auto-contrast and the data strip
    ============================================================ */
@@ -795,9 +1090,10 @@ function darken(hex, a){
    would otherwise have against this colour. */
 function liftFor(hex){
   var c = contrast(PAPER, hex);
-  if(c >= 4.5) return '0 1px 8px rgba(0,0,0,.35)';
-  if(c >= 2.6) return '0 1px 2px rgba(0,0,0,.5), 0 2px 12px rgba(0,0,0,.42)';
-  return '0 0 1px rgba(0,0,0,.7), 0 1px 2px rgba(0,0,0,.6), 0 2px 10px rgba(0,0,0,.5), 0 4px 22px rgba(0,0,0,.4)';
+  // soft and open rather than a dark rim — wide blurs, low alpha
+  if(c >= 4.5) return '0 1px 10px rgba(0,0,0,.24)';
+  if(c >= 2.6) return '0 1px 4px rgba(0,0,0,.22), 0 3px 16px rgba(0,0,0,.20)';
+  return '0 1px 4px rgba(0,0,0,.26), 0 3px 14px rgba(0,0,0,.22), 0 8px 32px rgba(0,0,0,.18)';
 }
 
 function rgbStr(hex){ var r = hexToRgb(hex); return r[0]+', '+r[1]+', '+r[2]; }
@@ -870,6 +1166,7 @@ var I18N = {
     'cal.eyebrow':'Journal', 'cal.today':'Today', 'cal.hint':'Tap a day to record',
     'foot.local':'Stored on this device',
     'theme.label':'Switch between light and dark',
+    'nav.palette':'Palette', 'nav.guide':'Guide', 'menu.label':'Menu',
     'dow':['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
     'locale':'en-GB',
     recorded:function(r){ return r + ' recorded'; },
@@ -884,8 +1181,8 @@ var I18N = {
     'brand.sub':'色の日記', 'nav.journal':'日記を見る',
     'top.tagline':'色を選んで、気分を知る',
     'top.h1':'今日は何色？',
-    'top.lede':'目がとまった色が、今日の色。',
-    'top.readout':'色を選ぶ',
+    'top.lede':'今にしっくりくる色をえらんで',
+    'top.readout':'色をえらぶ',
     'top.foot':'日本の伝統色 60',
     'back.palette':'← 色見本', 'back.colour':'← 色',
     'sec.mood':'気分', 'sec.moodSub':'MOOD',
@@ -902,6 +1199,7 @@ var I18N = {
     'cal.hint':'日付を選んで記録',
     'foot.local':'この端末に保存されます',
     'theme.label':'ライトとダークを切り替え',
+    'nav.palette':'色見本', 'nav.guide':'ガイド', 'menu.label':'メニュー',
     'dow':['月','火','水','木','金','土','日'],
     'locale':'ja-JP',
     recorded:function(r){ return r + ' を記録しました'; },
@@ -944,6 +1242,8 @@ function applyLang(l){
 
   var tb = document.getElementById('themeBtn');
   if(tb) tb.setAttribute('aria-label', t('theme.label'));
+  var mb = document.getElementById('menuBtn');
+  if(mb) mb.setAttribute('aria-label', t('menu.label'));
 
   var btn = document.getElementById('langBtn');
   if(btn) btn.textContent = lang === 'ja' ? '日本語' : 'EN';
@@ -952,11 +1252,97 @@ function applyLang(l){
 
   // re-render anything already on screen in the old language
   renderPalette();
+  renderGuide();
+  renderCopyright();
   clearReadout();
   if(selected) selectColor(selectedIndex, true);
   renderCalendar();
 }
 function toggleLang(){ applyLang(lang === 'ja' ? 'en' : 'ja'); }
+
+/* ============================================================
+   guide page
+   ============================================================ */
+function el(tag, cls, text){
+  var n = document.createElement(tag);
+  if(cls) n.className = cls;
+  if(text != null) n.textContent = text;
+  return n;
+}
+
+function renderGuide(){
+  var host = document.getElementById('guideBody');
+  if(!host) return;
+  host.innerHTML = '';
+  setText('guideTitle', GUIDE.heading[lang]);
+
+  GUIDE.sections.forEach(function(sec){
+    var w = el('section', 'guide-sec');
+    w.appendChild(el('h3', null, sec.title[lang]));
+    sec[lang].forEach(function(t){ w.appendChild(el('p', null, t)); });
+    host.appendChild(w);
+  });
+
+  var hues = el('section', 'guide-sec');
+  hues.appendChild(el('h3', null, GUIDE.coloursHeading[lang]));
+  hues.appendChild(el('p', 'guide-note', GUIDE.note[lang]));
+  var list = el('div', 'hue-list');
+  GUIDE.colours.forEach(function(c){
+    var row = el('div', 'hue');
+    var chip = el('span', 'hue-chip');
+    chip.style.setProperty('--c', c.hex);
+    row.appendChild(chip);
+    var body = el('div');
+    body.appendChild(el('div', 'hue-name', lang === 'ja' ? c.ja : c.en));
+    body.appendChild(el('div', 'hue-body', lang === 'ja' ? c.bodyJa : c.bodyEn));
+    row.appendChild(body);
+    list.appendChild(row);
+  });
+  hues.appendChild(list);
+  host.appendChild(hues);
+
+  var about = el('section', 'guide-sec');
+  about.appendChild(el('h3', null, GUIDE.story.title[lang]));
+  GUIDE.story[lang].forEach(function(t){ about.appendChild(el('p', null, t)); });
+  host.appendChild(about);
+
+  var refs = el('section', 'guide-sec');
+  refs.appendChild(el('h3', null, GUIDE.refsHeading[lang]));
+  var ul = el('ul', 'ref-list');
+  GUIDE.refs.forEach(function(u){
+    var li = el('li');
+    var a = el('a', null, u);
+    a.href = u; a.target = '_blank'; a.rel = 'noopener noreferrer';
+    li.appendChild(a); ul.appendChild(li);
+  });
+  refs.appendChild(ul);
+  host.appendChild(refs);
+}
+
+/* one copyright line, echoing the wordmark above */
+function renderCopyright(){
+  var y = new Date().getFullYear();
+  var nodes = document.querySelectorAll('.copy');
+  for(var i=0;i<nodes.length;i++) nodes[i].textContent = '© ' + y + ' IRO';
+  setText('footGuide', '© ' + y + ' IRO');
+}
+
+/* ============================================================
+   menu
+   ============================================================ */
+function setMenu(open){
+  var m = document.getElementById('menu'), b = document.getElementById('menuBtn');
+  if(!m || !b) return;
+  m.classList.toggle('open', open);
+  b.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function menuGo(page){
+  setMenu(false);
+  if(page === 'calendar') goCalendar();
+  else if(page === 'guide') goGuide();
+  else goTop();
+}
+function goGuide(){ renderGuide(); showPage('guide'); }
 
 /* ============================================================
    navigation
@@ -1005,14 +1391,45 @@ function toast(msg){
 /* ============================================================
    palette wall
    ============================================================ */
-/* colorData is stored in gradient order (hue wheel, then neutrals
-   light to dark), so the wall is rendered exactly as authored. */
+/* colorData is stored in gradient order (hue wheel, then neutrals light to
+   dark). The ramp itself never changes — what rotates each visit is the corner
+   it starts from, so the wall looks different without breaking the gradient. */
+var ORIENT = (function(){
+  try{
+    var prev = parseInt(localStorage.getItem('iro-orient') || '-1', 10);
+    if(isNaN(prev)) prev = -1;
+    var o = (prev + 1) % 4;
+    localStorage.setItem('iro-orient', String(o));
+    return o;
+  }catch(e){ return Math.floor(Math.random() * 4); }
+})();
+
+/* bit 1 mirrors left-right, bit 2 mirrors top-bottom:
+   0 = from the top left, 1 = top right, 2 = bottom left, 3 = bottom right */
+function layoutOrder(list, cols){
+  if(cols < 1) return list.slice();
+  var grid = [], r;
+  for(r = 0; r < Math.ceil(list.length / cols); r++){
+    grid.push(list.slice(r * cols, (r + 1) * cols));
+  }
+  if(ORIENT & 1) grid = grid.map(function(row){ return row.slice().reverse(); });
+  if(ORIENT & 2) grid = grid.slice().reverse();
+  return [].concat.apply([], grid);
+}
+
+function gridColumns(el){
+  var t = getComputedStyle(el).gridTemplateColumns;
+  return t ? t.split(' ').filter(Boolean).length : 1;
+}
+var renderedCols = 0;
+
 function renderPalette(){
   var grid = document.getElementById('swatchGrid');
   if(!grid) return;
   grid.innerHTML = '';
 
-  colorData.forEach(function(c, i){
+  renderedCols = gridColumns(grid);
+  layoutOrder(colorData, renderedCols).forEach(function(c){
     if(!c) return;
     var b = document.createElement('button');
     b.className = 'swatch';
@@ -1302,10 +1719,29 @@ document.addEventListener('keydown', function(e){
   if(e.key === 'Escape'){
     var m = document.getElementById('modal');
     if(m && m.classList.contains('active')) closeModal();
+    setMenu(false);
   }
 });
 document.getElementById('modal').addEventListener('click', function(e){
   if(e.target === this) closeModal();
+});
+
+document.getElementById('menuBtn').addEventListener('click', function(e){
+  e.stopPropagation();
+  setMenu(!document.getElementById('menu').classList.contains('open'));
+});
+document.addEventListener('click', function(e){
+  var w = e.target.closest ? e.target.closest('.menu-wrap') : null;
+  if(!w) setMenu(false);
+});
+
+var resizeTimer = null;
+window.addEventListener('resize', function(){
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(function(){
+    var g = document.getElementById('swatchGrid');
+    if(g && gridColumns(g) !== renderedCols) renderPalette();
+  }, 150);
 });
 
 (function initLang(){
