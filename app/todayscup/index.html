@@ -281,8 +281,9 @@
   .act:hover, .act:focus-visible{ color:var(--ink); outline:none; }
   .act:active{ opacity:.5; }
   .act svg{ width:19px; height:19px; display:block; }
-  .act-share{ margin-left:-6px; }
+  .act-group{ display:inline-flex; align-items:center; gap:2px; margin-left:-6px; }
   .act-clear{ margin-right:-6px; white-space:nowrap; }
+  .act[disabled]{ opacity:.35; pointer-events:none; }
 
   .toast{
     position:fixed;
@@ -350,9 +351,14 @@
   </div>
 
   <div class="actions">
-    <button type="button" class="act act-share" id="shareBtn" aria-label="Share this ticket" title="Share">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15.5V3.2"/><path d="M8 7.2l4-4 4 4"/><path d="M4.2 13v6a2 2 0 0 0 2 2h11.6a2 2 0 0 0 2-2v-6"/></svg>
-    </button>
+    <div class="act-group">
+      <button type="button" class="act act-share" id="shareBtn" aria-label="Share this ticket as an image" title="Share">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15.5V3.2"/><path d="M8 7.2l4-4 4 4"/><path d="M4.2 13v6a2 2 0 0 0 2 2h11.6a2 2 0 0 0 2-2v-6"/></svg>
+      </button>
+      <button type="button" class="act act-save" id="saveBtn" aria-label="Save this ticket as an image" title="Save image">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2v12.3"/><path d="M8 11.5l4 4 4-4"/><path d="M4.2 15v4a2 2 0 0 0 2 2h11.6a2 2 0 0 0 2-2v-4"/></svg>
+      </button>
+    </div>
     <div class="hint">tap any field to edit</div>
     <button type="button" class="act act-clear" id="clearBtn">CLEAR ALL</button>
   </div>
@@ -529,33 +535,241 @@
     toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
   }
 
-  function ticketText(){
-    const val = (el) => el.textContent.trim();
-    const tea = val(teaName), loc = val(teaLocation);
-    const lines = [`TODAY'S CUP  ${val(dateField)}`];
-    if(tea) lines.push(loc ? `${tea} @ ${loc}` : tea);
-    if(val(typeField))   lines.push(`Type: ${val(typeField)}`);
-    if(val(originField)) lines.push(`Origin: ${val(originField)}`);
-    if(val(noteField))   lines.push(`Taste note: ${val(noteField)}`);
-    return lines.join('\n');
+  const val = (el) => el.textContent.trim();
+
+  // ---- render the ticket to a PNG ----
+  // Drawn by hand on a canvas rather than rasterising the DOM: SVG/foreignObject
+  // export is unreliable on iOS Safari, which is the main place this gets used.
+  // Layout constants below mirror the CSS above -- keep them in sync.
+  const MONO = "'Courier Prime', monospace";
+  const PAPER = '#F4F5F4', INK = '#383D40', FADED = '#9AA1A5', RULE = '#DCE0E1';
+  const CARD_W = 360, PAD_X = 22, PAD_T = 20, PAD_B = 18, MARGIN = 20;
+
+  // canvas has no letter-spacing in older Safari, so space glyphs manually
+  function lsText(ctx, text, x, y, spacing, align){
+    let total = 0;
+    for(const ch of text) total += ctx.measureText(ch).width + spacing;
+    total = Math.max(0, total - spacing);
+    let cx = (align === 'center') ? x - total/2 : x;
+    for(const ch of text){
+      ctx.fillText(ch, cx, y);
+      cx += ctx.measureText(ch).width + spacing;
+    }
+    return total;
   }
 
-  document.getElementById('shareBtn').addEventListener('click', async () => {
-    const data = { title: "Today's Cup", text: ticketText(), url: window.location.href };
-    if(navigator.share){
-      try { await navigator.share(data); }
+  function wrapLines(ctx, text, maxW){
+    const words = text.split(/\s+/).filter(Boolean);
+    const lines = [];
+    let line = '';
+    for(const w of words){
+      const test = line ? line + ' ' + w : w;
+      if(ctx.measureText(test).width > maxW && line){ lines.push(line); line = w; }
+      else line = test;
+    }
+    if(line) lines.push(line);
+    return lines;
+  }
+
+  async function renderTicket(scale){
+    // make sure the webfonts are actually available to canvas
+    try {
+      await Promise.all([
+        document.fonts.load("700 13px 'Courier Prime'"),
+        document.fonts.load("400 14px 'Courier Prime'"),
+        document.fonts.load("400 11px 'Courier Prime'")
+      ]);
+      await document.fonts.ready;
+    } catch(e){ /* fall back to whatever is available */ }
+
+    const contentW = CARD_W - PAD_X*2;
+    const photoBox = Math.round(contentW * 0.78);
+
+    // measure pass: find the card height before drawing
+    const probe = document.createElement('canvas').getContext('2d');
+    probe.font = `400 14px ${MONO}`;
+    const noteLines = val(noteField) ? wrapLines(probe, val(noteField), contentW) : [];
+    // these increments mirror the draw pass below exactly, so the bottom
+    // padding comes out equal to the top rather than drifting
+    const noteBlockH = noteLines.length ? (noteLines.length - 1) * 26 + 18 : 18;
+    const cardH = PAD_T + 32 + 28 + 20 + 26 + photoBox + 26 + 43 + 22 + 25
+                + noteBlockH + PAD_B;
+
+    const W = CARD_W + MARGIN*2, H = Math.round(cardH) + MARGIN*2;
+    const cv = document.createElement('canvas');
+    cv.width = W * scale; cv.height = H * scale;
+    const ctx = cv.getContext('2d');
+    ctx.scale(scale, scale);
+    ctx.textBaseline = 'alphabetic';
+
+    // page backdrop
+    ctx.fillStyle = '#E1E4E5';
+    ctx.fillRect(0, 0, W, H);
+
+    // card + soft shadow
+    ctx.save();
+    ctx.shadowColor = 'rgba(40,46,50,0.16)';
+    ctx.shadowBlur = 30; ctx.shadowOffsetY = 12;
+    ctx.fillStyle = PAPER;
+    ctx.fillRect(MARGIN, MARGIN, CARD_W, cardH);
+    ctx.restore();
+
+    // the three tinted washes from the CSS
+    ctx.save();
+    ctx.beginPath(); ctx.rect(MARGIN, MARGIN, CARD_W, cardH); ctx.clip();
+    ctx.globalCompositeOperation = 'multiply';
+    const washes = [[0.88,0.04,300,220,0.10],[0.06,0.96,260,240,0.11],[0.20,0.30,240,200,0.06]];
+    for(const [fx,fy,rx,ry,a] of washes){
+      const cx = MARGIN + CARD_W*fx, cy = MARGIN + cardH*fy;
+      ctx.save();
+      ctx.translate(cx, cy); ctx.scale(1, ry/rx);
+      const g = ctx.createRadialGradient(0,0,0,0,0,rx);
+      g.addColorStop(0, `rgba(110,124,130,${a})`);
+      g.addColorStop(0.65, 'rgba(110,124,130,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(0,0,rx,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+    ctx.restore();
+
+    // paper grain
+    ctx.save();
+    ctx.beginPath(); ctx.rect(MARGIN, MARGIN, CARD_W, cardH); ctx.clip();
+    ctx.globalAlpha = 0.035;
+    for(let i = 0; i < 5200; i++){
+      const gx = MARGIN + Math.random()*CARD_W, gy = MARGIN + Math.random()*cardH;
+      ctx.fillStyle = Math.random() > 0.5 ? '#000' : '#fff';
+      ctx.fillRect(gx, gy, 1, 1);
+    }
+    ctx.restore();
+
+    const left = MARGIN + PAD_X, centre = MARGIN + CARD_W/2;
+    let y = MARGIN + PAD_T;
+
+    // title + date
+    ctx.fillStyle = FADED;
+    ctx.font = `700 13px ${MONO}`;
+    y += 13;
+    lsText(ctx, "TODAY'S CUP", centre, y, 13*0.22, 'center');
+    y += 6 + 13;
+    lsText(ctx, val(dateField), centre, y, 13*0.22, 'center');
+    y += 22 + 6;
+
+    // byline
+    const tea = val(teaName), loc = val(teaLocation);
+    if(tea){
+      ctx.font = `400 14px ${MONO}`;
+      const label = loc ? `${tea} @ ${loc}` : tea;
+      ctx.fillStyle = INK;
+      ctx.textAlign = 'center';
+      ctx.fillText(label, centre, y + 14);
+      ctx.textAlign = 'left';
+    }
+    y += 20 + 26;
+
+    // photo
+    const px = MARGIN + PAD_X + (contentW - photoBox)/2;
+    ctx.fillStyle = '#FAFBFB';
+    ctx.fillRect(px, y, photoBox, photoBox);
+    ctx.strokeStyle = RULE; ctx.lineWidth = 1;
+    ctx.strokeRect(px + 0.5, y + 0.5, photoBox - 1, photoBox - 1);
+    const innerX = px + 10, innerY = y + 10, innerS = photoBox - 20;
+    ctx.fillStyle = '#E7EAEB';
+    ctx.fillRect(innerX, innerY, innerS, innerS);
+
+    if(photoSlot.classList.contains('has-image') && natW && natH){
+      // map the on-screen pan/zoom crop onto the exported frame
+      const f = photoInner.getBoundingClientRect();
+      const dw = natW * baseScale * zoom, dh = natH * baseScale * zoom;
+      const x0 = (f.width - dw)/2 + panX, y0 = (f.height - dh)/2 + panY;
+      const sx = (-x0) * (natW/dw), sy = (-y0) * (natH/dh);
+      const sw = f.width * (natW/dw), sh = f.height * (natH/dh);
+      ctx.save();
+      ctx.beginPath(); ctx.rect(innerX, innerY, innerS, innerS); ctx.clip();
+      try { ctx.drawImage(photoImg, sx, sy, sw, sh, innerX, innerY, innerS, innerS); }
+      catch(e){ /* leave the empty frame */ }
+      ctx.restore();
+    }
+    y += photoBox + 26;
+
+    // type / origin
+    const colW = (contentW - 20)/2;
+    const cols = [[left, 'TYPE', val(typeField)], [left + colW + 20, 'ORIGIN', val(originField)]];
+    for(const [cx, label, value] of cols){
+      ctx.fillStyle = FADED;
+      ctx.font = `400 11px ${MONO}`;
+      ctx.globalAlpha = 0.85;
+      lsText(ctx, label, cx, y + 11, 11*0.14, 'left');
+      ctx.globalAlpha = 1;
+      if(value){
+        ctx.fillStyle = INK;
+        ctx.font = `400 14px ${MONO}`;
+        ctx.fillText(value, cx, y + 11 + 6 + 14);
+      }
+    }
+    y += 17 + 6 + 20 + 22;
+
+    // taste note
+    ctx.fillStyle = FADED;
+    ctx.font = `400 11px ${MONO}`;
+    ctx.globalAlpha = 0.85;
+    lsText(ctx, 'TASTE NOTE', left, y + 11, 11*0.14, 'left');
+    ctx.globalAlpha = 1;
+    y += 17 + 8;
+    ctx.fillStyle = INK;
+    ctx.font = `400 14px ${MONO}`;
+    noteLines.forEach((ln, i) => ctx.fillText(ln, left, y + 14 + i*26));
+
+    return cv;
+  }
+
+  function ticketFilename(){
+    const tea = val(teaName).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    const date = val(dateField).replace(/\./g,'');
+    return `todays-cup-${date}${tea ? '-' + tea : ''}.png`;
+  }
+
+  function toBlob(cv){
+    return new Promise((res) => cv.toBlob(res, 'image/png'));
+  }
+
+  function downloadBlob(blob, name){
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  async function withBusy(btn, fn){
+    btn.disabled = true;
+    try { await fn(); }
+    catch(err){ showToast('could not make image'); }
+    finally { btn.disabled = false; }
+  }
+
+  const shareBtn = document.getElementById('shareBtn');
+  const saveBtn  = document.getElementById('saveBtn');
+
+  saveBtn.addEventListener('click', () => withBusy(saveBtn, async () => {
+    const blob = await toBlob(await renderTicket(3));
+    downloadBlob(blob, ticketFilename());
+    showToast('image saved');
+  }));
+
+  shareBtn.addEventListener('click', () => withBusy(shareBtn, async () => {
+    const blob = await toBlob(await renderTicket(3));
+    const name = ticketFilename();
+    const file = new File([blob], name, { type: 'image/png' });
+    if(navigator.canShare && navigator.canShare({ files: [file] })){
+      try { await navigator.share({ files: [file], title: "Today's Cup" }); }
       catch(err){ if(err && err.name !== 'AbortError') showToast('could not share'); }
       return;
     }
-    // desktop / unsupported browsers: fall back to the clipboard
-    const payload = `${data.text}\n${data.url}`;
-    try {
-      await navigator.clipboard.writeText(payload);
-      showToast('copied to clipboard');
-    } catch(err){
-      showToast('sharing not supported');
-    }
-  });
+    // no file sharing here (most desktop browsers) -- save it instead
+    downloadBlob(blob, name);
+    showToast('image saved');
+  }));
 
   document.getElementById('clearBtn').addEventListener('click', () => {
     if(!confirm('Clear this ticket?')) return;
