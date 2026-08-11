@@ -282,7 +282,14 @@
   .act:active{ opacity:.5; }
   .act svg{ width:19px; height:19px; display:block; }
   .act-group{ display:inline-flex; align-items:center; gap:2px; margin-left:-6px; }
-  .act-clear{ margin-right:-6px; white-space:nowrap; }
+  .act-clear{
+    margin-right:-6px;
+    white-space:nowrap;
+    /* matches the hint beside it */
+    font-family:'Zen Kaku Gothic New', 'Noto Sans SC', sans-serif;
+    font-size:11.5px;
+    letter-spacing:normal;
+  }
   .act[disabled]{ opacity:.35; pointer-events:none; }
 
   .toast{
@@ -359,7 +366,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2v12.3"/><path d="M8 11.5l4 4 4-4"/><path d="M4.2 15v4a2 2 0 0 0 2 2h11.6a2 2 0 0 0 2-2v-4"/></svg>
       </button>
     </div>
-    <div class="hint">tap any field to edit</div>
+    <div class="hint">tap to edit</div>
     <button type="button" class="act act-clear" id="clearBtn">CLEAR ALL</button>
   </div>
 </div>
@@ -761,8 +768,10 @@
     const blob = await toBlob(await renderTicket(3));
     const name = ticketFilename();
     const file = new File([blob], name, { type: 'image/png' });
+    // Hand over the image only — no title, text or url, so the sheet offers
+    // Save to Photos rather than a link to this page.
     if(navigator.canShare && navigator.canShare({ files: [file] })){
-      try { await navigator.share({ files: [file], title: "Today's Cup" }); }
+      try { await navigator.share({ files: [file] }); }
       catch(err){ if(err && err.name !== 'AbortError') showToast('could not share'); }
       return;
     }
