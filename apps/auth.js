@@ -9,7 +9,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     const cover = document.createElement("div");
     cover.id = "apps-lock";
-    cover.innerHTML = `<form><p class="lock-kicker">KELLY'S APPS</p><h1>Private apps</h1><p>パスワードを入力してください。</p><input type="password" autocomplete="current-password" placeholder="Password" aria-label="Password" required><button>開く</button><small>変更・解除は <a href="mailto:${email}?subject=Apps%20password%20change">${email}</a> へメールしてください。</small><b aria-live="polite"></b></form>`;
+    cover.innerHTML = `<form><p class="lock-kicker">KELLY'S APPS</p><h1>Private apps</h1><p>パスワードを入力してください。</p><input type="password" autocomplete="current-password" placeholder="Password" aria-label="Password" required><button>開く</button><small><a href="mailto:${email}?subject=Apps%20password%20reset">パスワードをリセット</a></small><b aria-live="polite"></b></form>`;
     document.body.prepend(cover);
     const form = cover.querySelector("form"), input = cover.querySelector("input"), error = cover.querySelector("b");
     form.addEventListener("submit", async (event) => { event.preventDefault(); if (await digest(input.value) === HASH) { sessionStorage.setItem(KEY, "yes"); sessionStorage.setItem("screenshot-memory-password", input.value); unlock(); cover.remove(); } else { error.textContent = "パスワードが違います。"; input.select(); } });
