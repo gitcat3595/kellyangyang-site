@@ -758,13 +758,12 @@
   const shareBtn = document.getElementById('shareBtn');
   const saveBtn  = document.getElementById('saveBtn');
 
-  saveBtn.addEventListener('click', () => withBusy(saveBtn, async () => {
-    const blob = await toBlob(await renderTicket(3));
-    downloadBlob(blob, ticketFilename());
-    showToast('image saved');
-  }));
-
-  shareBtn.addEventListener('click', () => withBusy(shareBtn, async () => {
+  // A web page cannot write into the iOS photo library on its own -- <a download>
+  // lands in Files, not Photos. The only route to Photos is the native share
+  // sheet, whose "Save Image" action files it there. So both buttons go through
+  // the sheet whenever it can carry a file, and fall back to a plain download
+  // on desktop and anywhere else that can't share files.
+  async function deliverTicket(){
     const blob = await toBlob(await renderTicket(3));
     const name = ticketFilename();
     const file = new File([blob], name, { type: 'image/png' });
@@ -775,10 +774,12 @@
       catch(err){ if(err && err.name !== 'AbortError') showToast('could not share'); }
       return;
     }
-    // no file sharing here (most desktop browsers) -- save it instead
     downloadBlob(blob, name);
     showToast('image saved');
-  }));
+  }
+
+  saveBtn.addEventListener('click', () => withBusy(saveBtn, deliverTicket));
+  shareBtn.addEventListener('click', () => withBusy(shareBtn, deliverTicket));
 
   document.getElementById('clearBtn').addEventListener('click', () => {
     if(!confirm('Clear this ticket?')) return;
