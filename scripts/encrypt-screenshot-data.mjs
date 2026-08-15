@@ -1,12 +1,19 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile, mkdir, copyFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
 import { randomBytes, pbkdf2Sync, createCipheriv } from "node:crypto";
 const [input, output] = process.argv.slice(2);
 if (!input || !output || (!process.argv.includes("--plain") && !process.env.SCREENSHOT_MEMORY_PASSWORD)) throw new Error("Pass input, output, and SCREENSHOT_MEMORY_PASSWORD.");
-const source = JSON.parse(await readFile(input, "utf8")).map((item) => ({
+const raw = JSON.parse(await readFile(input, "utf8"));
+const source = raw.map((item) => ({
   title: (item.text.split("\n").find((line) => line.replace(/[^\p{L}\p{N}]/gu, "").length > 8) ?? item.text).slice(0, 100),
-  text: item.text, date: new Date(item.takenAt).toLocaleDateString("ja-JP").replaceAll("/", "."), tags: item.tags,
+  text: item.text, date: new Date(item.takenAt).toLocaleDateString("ja-JP").replaceAll("/", "."), tags: item.tags, imageUrl: `images/${item.id}.jpeg`,
 }));
 if (process.argv.includes("--plain")) {
+  if (process.argv.includes("--copy-images")) {
+    const imageDirectory = join(dirname(output), "images");
+    await mkdir(imageDirectory, { recursive: true });
+    await Promise.all(raw.map((item) => copyFile(item.imagePath, join(imageDirectory, `${item.id}.jpeg`)).catch(() => undefined)));
+  }
   await writeFile(output, JSON.stringify(source));
   process.exit(0);
 }
