@@ -320,6 +320,8 @@ table.tbl tr:nth-child(even) td{background:var(--bgw);}
   <button onclick="bringFwd()">前面</button>
   <button onclick="sendBack()">背面</button>
   <button class="sb-del" onclick="deleteSel()">✕ 削除</button>
+  <div class="sb-sep"></div>
+  <span id="sel-count" style="font-size:10px;color:rgba(255,255,255,.5);white-space:nowrap;"></span>
 </div>
 
 <!-- ══════════════════════════════════════
@@ -680,7 +682,8 @@ table.tbl tr:nth-child(even) td{background:var(--bgw);}
 
 <script>
 /* ───── State ───── */
-let selEl = null, zoom = 1, dragState = null, mmPx = 3.7795;
+let selEls = new Set(); // multi-select
+let zoom = 1, dragState = null, lassoState = null, mmPx = 3.7795;
 
 /* ───── Calibrate mm ───── */
 (function(){
@@ -705,17 +708,32 @@ function fitZoom(){
 }
 window.addEventListener('resize',fitZoom);
 
-/* ───── Selection ───── */
-function select(el){
-  deselect();
+/* ───── Selection (multi) ───── */
+function primarySel(){const a=[...selEls]; return a[a.length-1]||null;}
+
+function addSel(el, clearFirst=true){
   if(!el||el.dataset.lock)return;
-  selEl=el; el.classList.add('sel');
-  posSelBar(el);
+  if(clearFirst) clearSel(false);
+  selEls.add(el); el.classList.add('sel');
+  updateSelBar();
 }
-function deselect(){
-  if(!selEl)return;
-  stopEdit(selEl); selEl.classList.remove('sel'); selEl=null;
-  document.getElementById('sel-bar').style.display='none';
+function toggleSel(el){
+  if(!el||el.dataset.lock)return;
+  if(selEls.has(el)){selEls.delete(el);el.classList.remove('sel');}
+  else{selEls.add(el);el.classList.add('sel');}
+  updateSelBar();
+}
+function clearSel(updateBar=true){
+  selEls.forEach(el=>{ stopEdit(el); el.classList.remove('sel'); });
+  selEls.clear();
+  if(updateBar) document.getElementById('sel-bar').style.display='none';
+}
+function updateSelBar(){
+  const pri=primarySel();
+  if(!pri){document.getElementById('sel-bar').style.display='none';return;}
+  posSelBar(pri);
+  const cnt=document.getElementById('sel-count');
+  if(cnt) cnt.textContent = selEls.size>1 ? `${selEls.size}個選択中` : '';
 }
 function posSelBar(el){
   const sb=document.getElementById('sel-bar');
@@ -724,7 +742,7 @@ function posSelBar(el){
   const sbH=sb.offsetHeight||36;
   let top=r.top-sbH-8; if(top<50)top=r.bottom+8;
   sb.style.top=top+'px';
-  sb.style.left=Math.max(8,Math.min(r.left,window.innerWidth-440))+'px';
+  sb.style.left=Math.max(8,Math.min(r.left,window.innerWidth-500))+'px';
 }
 
 /* ───── Edit ───── */
@@ -733,7 +751,7 @@ function startEdit(el){
   i.contentEditable='true'; el.classList.add('editing');
   i.focus();
   const rng=document.createRange(); rng.selectNodeContents(i); rng.collapse(false);
-  const sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(rng);
+  const s2=window.getSelection(); s2.removeAllRanges(); s2.addRange(rng);
 }
 function stopEdit(el){
   if(!el)return;
@@ -741,24 +759,40 @@ function stopEdit(el){
   el.classList.remove('editing');
 }
 
-/* ───── Actions ───── */
-function deleteSel(){if(selEl){selEl.remove();selEl=null;document.getElementById('sel-bar').style.display='none';}}
-function dupeSel(){
-  if(!selEl)return;
-  const c=selEl.cloneNode(true);
-  c.style.left=(parseFloat(selEl.style.left)+5)+'mm';
-  c.style.top=(parseFloat(selEl.style.top)+5)+'mm';
-  selEl.parentNode.appendChild(c); initObj(c); select(c);
+/* ───── Font size ───── */
+function changeFontSize(delta){
+  selEls.forEach(el=>{
+    const inner=el.querySelector('.obj-inner'); if(!inner)return;
+    const cur=parseFloat(window.getComputedStyle(inner).fontSize)||12;
+    inner.style.fontSize=Math.max(6,Math.round(cur+delta))+'px';
+  });
 }
-function bringFwd(){if(selEl){selEl.style.zIndex=(parseInt(selEl.style.zIndex||0)+1);}}
-function sendBack(){if(selEl){selEl.style.zIndex=Math.max(0,parseInt(selEl.style.zIndex||0)-1);}}
+
+/* ───── Actions ───── */
+function deleteSel(){
+  selEls.forEach(el=>el.remove());
+  clearSel();
+}
+function dupeSel(){
+  const copies=[];
+  selEls.forEach(el=>{
+    const c=el.cloneNode(true);
+    c.style.left=(parseFloat(el.style.left)+5)+'mm';
+    c.style.top=(parseFloat(el.style.top)+5)+'mm';
+    el.parentNode.appendChild(c); initObj(c); copies.push(c);
+  });
+  clearSel(false);
+  copies.forEach(c=>addSel(c,false));
+  updateSelBar();
+}
+function bringFwd(){selEls.forEach(el=>{el.style.zIndex=(parseInt(el.style.zIndex||0)+1);});}
+function sendBack(){selEls.forEach(el=>{el.style.zIndex=Math.max(0,parseInt(el.style.zIndex||0)-1);});}
 function execFmt(cmd,val){document.execCommand(cmd,false,val||null);}
 
 /* ───── Style switcher ───── */
 function switchStyle(cls){
-  if(!selEl||!cls)return;
-  const inner=selEl.querySelector('.obj-inner'); if(!inner)return;
-  // strip all ot-* classes
+  const pri=primarySel(); if(!pri||!cls)return;
+  const inner=pri.querySelector('.obj-inner'); if(!inner)return;
   [...inner.classList].filter(c=>c.startsWith('ot-')||c==='sev'||c==='meta-item').forEach(c=>inner.classList.remove(c));
   if(cls)inner.classList.add(cls);
   document.getElementById('style-picker').value='';
@@ -823,18 +857,29 @@ function showSnap(el,slide){
 }
 
 document.addEventListener('mousemove',e=>{
+  // Lasso drag
+  if(lassoState){
+    const ls=lassoState;
+    const x=Math.min(e.clientX,ls.startX), y=Math.min(e.clientY,ls.startY);
+    const w=Math.abs(e.clientX-ls.startX), h=Math.abs(e.clientY-ls.startY);
+    ls.div.style.cssText=`position:fixed;left:${x}px;top:${y}px;width:${w}px;height:${h}px;border:1.5px dashed #0553dd;background:rgba(5,83,221,.07);pointer-events:none;z-index:9999;`;
+    return;
+  }
   if(!dragState)return;
   const dx=pxToMm(e.clientX-dragState.startX);
   const dy=pxToMm(e.clientY-dragState.startY);
-  const el=dragState.el;
   if(dragState.type==='move'){
     dragState.moved=true;
-    el.style.left=Math.max(0,dragState.origL+dx)+'mm';
-    el.style.top=Math.max(0,dragState.origT+dy)+'mm';
-    const slide=el.closest('.slide');
-    if(slide)showSnap(el,slide);
-    if(selEl===el)posSelBar(el);
+    // Move all selected elements together
+    dragState.origPositions.forEach((orig,el)=>{
+      el.style.left=Math.max(0,orig.l+dx)+'mm';
+      el.style.top=Math.max(0,orig.t+dy)+'mm';
+    });
+    const slide=dragState.el.closest('.slide');
+    if(slide&&selEls.size===1)showSnap(dragState.el,slide);
+    updateSelBar();
   } else if(dragState.type==='resize'){
+    const el=dragState.el;
     const h=dragState.handle;
     let l=dragState.origL,t=dragState.origT,w=dragState.origW,ht=dragState.origH;
     if(h.includes('e')){w=Math.max(5,w+dx);}
@@ -843,10 +888,27 @@ document.addEventListener('mousemove',e=>{
     if(h.includes('n')){const nh=Math.max(3,ht-dy);t=t+(ht-nh);ht=nh;}
     el.style.left=l+'mm';el.style.top=t+'mm';
     el.style.width=w+'mm';el.style.height=ht+'mm';
-    if(selEl===el)posSelBar(el);
+    updateSelBar();
   }
 });
-document.addEventListener('mouseup',()=>{
+document.addEventListener('mouseup',e=>{
+  if(lassoState){
+    // Lasso complete: select all objects inside rect
+    const ls=lassoState;
+    document.body.removeChild(ls.div);
+    lassoState=null;
+    const lx1=Math.min(e.clientX,ls.startX), ly1=Math.min(e.clientY,ls.startY);
+    const lx2=Math.max(e.clientX,ls.startX), ly2=Math.max(e.clientY,ls.startY);
+    if(lx2-lx1>4||ly2-ly1>4){
+      ls.slide.querySelectorAll('.obj').forEach(obj=>{
+        if(obj.dataset.lock)return;
+        const r=obj.getBoundingClientRect();
+        if(r.left<lx2&&r.right>lx1&&r.top<ly2&&r.bottom>ly1) addSel(obj,false);
+      });
+      updateSelBar();
+    }
+    return;
+  }
   if(dragState&&dragState.el)clearGuides(dragState.el);
   dragState=null;
 });
@@ -854,9 +916,10 @@ document.addEventListener('mouseup',()=>{
 function onMouseDown(e){
   const obj=e.currentTarget;
   if(obj.dataset.lock)return;
+  // Resize handle
   if(e.target.classList.contains('rh')){
     e.preventDefault();e.stopPropagation();
-    if(selEl!==obj)select(obj);
+    if(!selEls.has(obj))addSel(obj,true);
     const hPos=['nw','n','ne','e','se','s','sw','w'].find(p=>e.target.classList.contains(p));
     dragState={type:'resize',handle:hPos,startX:e.clientX,startY:e.clientY,
       origL:parseFloat(obj.style.left),origT:parseFloat(obj.style.top),
@@ -865,43 +928,62 @@ function onMouseDown(e){
   }
   if(obj.classList.contains('editing'))return;
   e.preventDefault();
-  select(obj);
-  dragState={type:'move',startX:e.clientX,startY:e.clientY,
-    origL:parseFloat(obj.style.left),origT:parseFloat(obj.style.top),
-    el:obj,moved:false};
+  if(e.shiftKey){
+    toggleSel(obj);
+  } else if(!selEls.has(obj)){
+    addSel(obj,true);
+  }
+  // Start move — snapshot ALL currently selected positions
+  const origPositions=new Map();
+  selEls.forEach(el=>origPositions.set(el,{l:parseFloat(el.style.left)||0,t:parseFloat(el.style.top)||0}));
+  dragState={type:'move',startX:e.clientX,startY:e.clientY,el:obj,origPositions,moved:false};
 }
 function onDblClick(e){
   const obj=e.currentTarget;
   if(obj.dataset.lock)return;
-  if(selEl!==obj)select(obj);
+  if(!selEls.has(obj))addSel(obj,true);
   startEdit(obj);
   e.preventDefault();
 }
 
-/* ───── Slide bg click → deselect ───── */
+/* ───── Slide bg → lasso or deselect ───── */
 document.querySelectorAll('.slide').forEach(s=>{
   s.addEventListener('mousedown',e=>{
-    if(e.target===s||e.target.classList.contains('slide-topbar')||e.target.classList.contains('slide-footer'))deselect();
+    const isBg=e.target===s||e.target.classList.contains('slide-topbar')||e.target.classList.contains('slide-footer')||e.target.classList.contains('guide-container');
+    if(!isBg)return;
+    if(!e.shiftKey)clearSel();
+    // Start lasso
+    const div=document.createElement('div');
+    document.body.appendChild(div);
+    lassoState={startX:e.clientX,startY:e.clientY,slide:s,div};
+    e.preventDefault();
   });
 });
 
 /* ───── Keyboard ───── */
 document.addEventListener('keydown',e=>{
-  if(selEl&&selEl.classList.contains('editing'))return;
-  if((e.key==='Delete'||e.key==='Backspace')&&selEl){e.preventDefault();deleteSel();}
-  if(e.key==='Escape')deselect();
+  const pri=primarySel();
+  if(pri&&pri.classList.contains('editing'))return;
+  if((e.key==='Delete'||e.key==='Backspace')&&selEls.size>0){e.preventDefault();deleteSel();}
+  if(e.key==='Escape')clearSel();
   if((e.metaKey||e.ctrlKey)&&e.key==='s'){e.preventDefault();saveHTML();}
-  if((e.metaKey||e.ctrlKey)&&e.key==='d'&&selEl){e.preventDefault();dupeSel();}
-  if(selEl&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){
+  if((e.metaKey||e.ctrlKey)&&e.key==='d'&&selEls.size>0){e.preventDefault();dupeSel();}
+  // Cmd+> / Cmd+< for font size
+  if((e.metaKey||e.ctrlKey)&&e.key==='.'){e.preventDefault();changeFontSize(1);}
+  if((e.metaKey||e.ctrlKey)&&e.key===','){e.preventDefault();changeFontSize(-1);}
+  if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.key==='.'){e.preventDefault();changeFontSize(4);}
+  if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.key===','){e.preventDefault();changeFontSize(-4);}
+  if(selEls.size>0&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){
     e.preventDefault();
     const step=e.shiftKey?5:1;
-    const l=parseFloat(selEl.style.left||0);
-    const t=parseFloat(selEl.style.top||0);
-    if(e.key==='ArrowLeft')selEl.style.left=(l-step)+'mm';
-    if(e.key==='ArrowRight')selEl.style.left=(l+step)+'mm';
-    if(e.key==='ArrowUp')selEl.style.top=(t-step)+'mm';
-    if(e.key==='ArrowDown')selEl.style.top=(t+step)+'mm';
-    posSelBar(selEl);
+    selEls.forEach(el=>{
+      const l=parseFloat(el.style.left||0), t=parseFloat(el.style.top||0);
+      if(e.key==='ArrowLeft')el.style.left=(l-step)+'mm';
+      if(e.key==='ArrowRight')el.style.left=(l+step)+'mm';
+      if(e.key==='ArrowUp')el.style.top=(t-step)+'mm';
+      if(e.key==='ArrowDown')el.style.top=(t+step)+'mm';
+    });
+    updateSelBar();
   }
 });
 
@@ -930,7 +1012,7 @@ function makeObj(html,style,innerCls){
   el.className='obj';
   el.style.cssText=style||'left:40mm;top:40mm;width:80mm;height:20mm;';
   el.innerHTML=HANDLES+`<div class="obj-inner ${innerCls||''}">${html}</div>`;
-  slide.appendChild(el); initObj(el); select(el); return el;
+  slide.appendChild(el); initObj(el); addSel(el,true); return el;
 }
 function addObj(type){
   const map={
@@ -951,7 +1033,7 @@ function addObjStyled(boxType){
 
 /* ───── Save ───── */
 function saveHTML(){
-  deselect();
+  clearSel();
   const html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
   const a=Object.assign(document.createElement('a'),{
     href:URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'})),
