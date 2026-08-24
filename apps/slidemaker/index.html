@@ -255,7 +255,8 @@ table.tbl tr:nth-child(even) td{background:var(--bgw);}
   <button class="tb-btn" onclick="adjustZoom(0.1)">＋</button>
   <button class="tb-btn" onclick="fitZoom()">フィット</button>
   <div class="sep"></div>
-  <button class="tb-btn pri" onclick="window.print()">🖨 印刷</button>
+  <button class="tb-btn pri" onclick="exportPptx()">📥 PPTX出力</button>
+  <button class="tb-btn" onclick="window.print()">🖨 印刷</button>
   <button class="tb-btn" onclick="saveHTML()">💾 保存</button>
   <button class="tb-btn" onclick="toggleThemePanel()" id="theme-btn">🎨 テーマ</button>
   <span class="hint">クリック→選択 · ドラッグ→移動 · ダブルクリック→編集 · Delete→削除</span>
@@ -1098,6 +1099,86 @@ function saveHTML(){
 }
 
 fitZoom();
+
+/* ───── PPTX Export ───── */
+function exportPptx(){
+  // Load PptxGenJS on demand
+  if(!window.PptxGenJS){
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js';
+    s.onload=()=>_doPptxExport();
+    s.onerror=()=>alert('PptxGenJS の読み込みに失敗しました。ネット接続を確認してください。');
+    document.head.appendChild(s);
+  } else {
+    _doPptxExport();
+  }
+}
+function _doPptxExport(){
+  const MM=0.03937; // mm to inches
+  const pptx=new PptxGenJS();
+  pptx.layout='LAYOUT_WIDE'; // 13.33" x 7.5" — closest to A4 landscape; we override below
+  pptx.defineLayout({name:'A4L',width:11.69,height:8.27});
+  pptx.layout='A4L';
+
+  const navy=getComputedStyle(document.documentElement).getPropertyValue('--navy').trim()||'#001fa6';
+
+  document.querySelectorAll('.slide').forEach(slide=>{
+    const sl=pptx.addSlide();
+    // White background
+    sl.background={fill:'FFFFFF'};
+
+    // Top bar (4mm tall)
+    sl.addShape(pptx.ShapeType.rect,{x:0,y:0,w:11.69,h:4*MM,fill:{color:navy.replace('#','')},line:{color:navy.replace('#',''),width:0}});
+
+    // Footer line (bottom 6mm)
+    sl.addShape(pptx.ShapeType.rect,{x:0,y:(210-6)*MM,w:11.69,h:6*MM,fill:{color:'F5F5F5'},line:{color:'C8CEDE',width:1}});
+
+    // Objects
+    slide.querySelectorAll('.obj').forEach(obj=>{
+      const l=parseFloat(obj.style.left)||0;
+      const t=parseFloat(obj.style.top)||0;
+      const w=parseFloat(obj.style.width)||60;
+      const h=parseFloat(obj.style.height)||15;
+      const inner=obj.querySelector('.obj-inner');
+      if(!inner)return;
+
+      const text=inner.innerText||'';
+      const cs=window.getComputedStyle(inner);
+      const fsPx=parseFloat(cs.fontSize)||12;
+      const fspt=Math.round(fsPx*0.75);
+      const isBold=cs.fontWeight>='600';
+      const colorHex=(cs.color||'rgb(18,18,18)').replace(/[^0-9,]/g,'').split(',').map(n=>parseInt(n).toString(16).padStart(2,'0')).join('').slice(0,6)||'121212';
+
+      // Background
+      let bgHex='FFFFFF';
+      const bgRgb=cs.backgroundColor;
+      if(bgRgb&&bgRgb!=='rgba(0, 0, 0, 0)'&&bgRgb!=='transparent'){
+        const m=bgRgb.match(/\d+/g);
+        if(m&&m.length>=3)bgHex=m.slice(0,3).map(n=>parseInt(n).toString(16).padStart(2,'0')).join('');
+      }
+
+      // Border
+      const hasBorder=inner.classList.contains('ot-box')||inner.classList.contains('ot-box-top')||
+                       inner.classList.contains('ot-box-dbl')||inner.classList.contains('ot-box-gray')||
+                       inner.classList.contains('ot-box-inv');
+      const lineOpts=hasBorder?{color:'C8CEDE',width:1}:{color:'FFFFFF',width:0};
+
+      sl.addText(text,{
+        x:l*MM, y:t*MM, w:w*MM, h:h*MM,
+        fontSize:fspt,
+        bold:isBold,
+        color:colorHex,
+        fill:{color:bgHex},
+        line:lineOpts,
+        valign:'top',
+        wrap:true,
+        shrinkText:false,
+      });
+    });
+  });
+
+  pptx.writeFile({fileName:'allerise-proposal.pptx'});
+}
 
 /* ───── Custom color palette ───── */
 function hexToHsl(hex){
