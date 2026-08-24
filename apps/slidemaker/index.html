@@ -2,8 +2,23 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<script src="../vendor/crypto-js.min.js?v=5"></script><script src="../auth.js?v=6"></script>
 <title>Allerise Slide Editor v2</title>
 <style>
+/* ── Auth lock overlay ── */
+html.apps-locked body>*:not(#apps-lock){display:none!important;}
+#apps-lock{position:fixed;inset:0;background:#0a0a0b;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;}
+#apps-lock form{display:flex;flex-direction:column;gap:12px;width:min(340px,90vw);padding:40px 36px;background:#141416;border-radius:16px;border:1px solid rgba(255,255,255,.1);}
+#apps-lock .lock-kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#6a6a73;margin:0;}
+#apps-lock h1{font-size:24px;font-weight:650;color:#f4f4f5;margin:0;}
+#apps-lock p{font-size:14px;color:#a2a2aa;margin:0;}
+#apps-lock input{padding:10px 14px;border:1px solid rgba(255,255,255,.15);border-radius:8px;background:rgba(255,255,255,.05);color:#f4f4f5;font-size:15px;outline:none;}
+#apps-lock input:focus{border-color:rgba(255,255,255,.35);}
+#apps-lock button{padding:10px;border:none;border-radius:8px;background:#001fa6;color:#fff;font-size:15px;font-weight:600;cursor:pointer;}
+#apps-lock button:hover{background:#0553dd;}
+#apps-lock small a{font-size:12px;color:#6a6a73;}
+#apps-lock b{color:#f43f5e;font-size:12px;min-height:16px;}
+/* ── end auth ── */
 :root{
   --blue:#001fa6;--bl:#0553dd;--navy:#001fa6;
   --rule:#C8CEDE;--rule2:#E8EBF4;
