@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Allerise Slide Editor v2</title>
+<style>
+:root{
+  --blue:#001fa6;--bl:#0553dd;--navy:#001fa6;
+  --rule:#C8CEDE;--rule2:#E8EBF4;
+  --ink:#121212;--ink2:#333;--ink3:#666;
+  --bg:#F5F5F5;--bgw:#FAFAFA;--w:#fff;
+  --chip-bg:#EEF2FF;
+}
+/* ── Themes ── */
+body.theme-charcoal{
+  --navy:#1C2432;--blue:#1C2432;--bl:#374151;
+  --rule:#C4C8D0;--rule2:#E4E6EA;
+  --bg:#F4F4F4;--bgw:#F9F9F9;--chip-bg:#EFEFEF;
+}
+body.theme-forest{
+  --navy:#1A3A2A;--blue:#1A3A2A;--bl:#2D6A4F;
+  --rule:#B8CCBF;--rule2:#E2EDE6;
+  --bg:#F2F6F3;--bgw:#F8FAF8;--chip-bg:#EAF2EC;
+}
+body.theme-burgundy{
+  --navy:#4A1628;--blue:#4A1628;--bl:#7B2D42;
+  --rule:#D0B8C0;--rule2:#EFE4E8;
+  --bg:#F8F3F4;--bgw:#FBF8F9;--chip-bg:#F4E8EC;
+}
+body.theme-slate{
+  --navy:#2E3A4E;--blue:#2E3A4E;--bl:#4A5D78;
+  --rule:#BFC8D4;--rule2:#E2E8EF;
+  --bg:#F3F5F8;--bgw:#F8F9FB;--chip-bg:#EBF0F5;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;background:#888;color:var(--ink);-webkit-font-smoothing:antialiased;}
+
+/* ── Appbar ── */
+#appbar{position:fixed;top:0;left:0;right:0;height:44px;background:#0f172a;display:flex;align-items:center;gap:5px;padding:0 12px;z-index:9000;box-shadow:0 2px 8px rgba(0,0,0,.5);}
+#appbar .logo{color:#fff;font-weight:800;font-size:12px;letter-spacing:.15em;margin-right:8px;}
+#appbar .sep{width:1px;height:20px;background:rgba(255,255,255,.15);margin:0 2px;}
+.tb-btn{background:rgba(255,255,255,.1);color:#fff;border:none;padding:4px 11px;border-radius:4px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:600;white-space:nowrap;}
+.tb-btn:hover{background:rgba(255,255,255,.2);}
+.tb-btn.pri{background:var(--blue);}
+.tb-btn.pri:hover{background:var(--bl);}
+#appbar select{background:rgba(255,255,255,.1);color:#fff;border:none;padding:4px 7px;border-radius:4px;font-size:11px;font-family:inherit;cursor:pointer;}
+#appbar select option{background:#0f172a;}
+#zoom-label{color:rgba(255,255,255,.5);font-size:11px;min-width:38px;text-align:center;}
+#appbar .hint{color:rgba(255,255,255,.3);font-size:10px;margin-left:auto;}
+
+/* ── Sel toolbar ── */
+#sel-bar{position:fixed;display:none;background:#1e293b;border-radius:6px;padding:4px 7px;gap:3px;align-items:center;z-index:8999;box-shadow:0 4px 20px rgba(0,0,0,.4);flex-wrap:wrap;max-width:600px;}
+#sel-bar button{background:rgba(255,255,255,.1);color:#fff;border:none;padding:2px 9px;border-radius:3px;font-size:10.5px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+#sel-bar button:hover{background:rgba(255,255,255,.2);}
+.sb-del{background:rgba(185,28,28,.7)!important;}
+.sb-del:hover{background:rgba(220,38,38,1)!important;}
+#sel-bar select{background:rgba(255,255,255,.1);color:#fff;border:none;padding:2px 5px;border-radius:3px;font-size:10.5px;font-family:inherit;cursor:pointer;max-width:140px;}
+#sel-bar select option{background:#1e293b;}
+#sel-bar .sb-sep{width:1px;height:14px;background:rgba(255,255,255,.15);margin:0 1px;}
+#sel-bar input[type=color]{width:22px;height:20px;border:none;background:none;cursor:pointer;padding:0;}
+
+/* ── Slides ── */
+#slides-area{padding:58px 0 50px;display:flex;flex-direction:column;align-items:center;}
+.page-wrap{margin:10px 0;position:relative;}
+.slide{width:297mm;height:210mm;background:var(--w);position:relative;overflow:hidden;box-shadow:0 6px 30px rgba(0,0,0,.35);transform-origin:top center;}
+.slide-topbar{position:absolute;top:0;left:0;right:0;height:4mm;background:var(--navy);z-index:1;pointer-events:none;}
+/* Snap guides */
+.guide-h{position:absolute;left:0;right:0;height:1px;background:#f43f5e;pointer-events:none;z-index:200;display:none;}
+.guide-v{position:absolute;top:0;bottom:0;width:1px;background:#f43f5e;pointer-events:none;z-index:200;display:none;}
+.slide-footer{position:absolute;bottom:4.5mm;left:18mm;right:18mm;display:flex;justify-content:space-between;font-size:8px;letter-spacing:.08em;color:#aaa;pointer-events:none;z-index:1;border-top:0.3px solid var(--rule2);padding-top:1.5mm;}
+
+/* ── Objects ── */
+.obj{position:absolute;cursor:default;user-select:none;}
+.obj.editing{cursor:text;user-select:text;}
+.obj.sel{outline:2px solid var(--bl);outline-offset:1px;z-index:100;}
+.obj.sel .obj-handles{display:block;}
+.obj-handles{display:none;position:absolute;inset:-1px;pointer-events:none;}
+.rh{position:absolute;width:8px;height:8px;background:var(--bl);border:1.5px solid #fff;border-radius:50%;pointer-events:all;z-index:10;}
+.rh.nw{top:-4px;left:-4px;cursor:nw-resize;}
+.rh.ne{top:-4px;right:-4px;cursor:ne-resize;}
+.rh.se{bottom:-4px;right:-4px;cursor:se-resize;}
+.rh.sw{bottom:-4px;left:-4px;cursor:sw-resize;}
+.rh.n{top:-4px;left:calc(50% - 4px);cursor:n-resize;}
+.rh.s{bottom:-4px;left:calc(50% - 4px);cursor:s-resize;}
+.rh.e{top:calc(50% - 4px);right:-4px;cursor:e-resize;}
+.rh.w{top:calc(50% - 4px);left:-4px;cursor:w-resize;}
+.obj-inner{width:100%;height:100%;overflow:hidden;}
+.obj-inner[contenteditable=true]{overflow:visible;}
+[contenteditable=true]:focus{outline:none;}
+
+/* ══════════════════════════════════════
+   OBJECT STYLES — Classic Consulting
+══════════════════════════════════════ */
+
+/* ─ Text styles ─ */
+.ot-plain   {font-size:11px;line-height:1.82;color:var(--ink2);}
+.ot-h1      {font-size:30px;font-weight:800;line-height:1.26;letter-spacing:-.02em;color:var(--navy);}
+.ot-h2      {font-size:22px;font-weight:800;line-height:1.3;letter-spacing:-.01em;color:var(--navy);}
+.ot-h3      {font-size:13px;font-weight:800;color:var(--navy);letter-spacing:.02em;}
+.ot-kicker  {font-size:9px;font-weight:700;color:var(--ink3);letter-spacing:.26em;text-transform:uppercase;}
+.ot-brand   {font-size:18px;font-weight:800;color:var(--navy);letter-spacing:.2em;}
+.ot-caption {font-size:8.5px;color:var(--ink3);letter-spacing:.08em;line-height:1.6;}
+.ot-price   {font-size:26px;font-weight:800;color:var(--navy);letter-spacing:-.02em;}
+
+/* ─ Box styles (no left stripe) ─ */
+/* 薄枠ボックス */
+.ot-box     {border:1px solid var(--rule);padding:4mm 5mm;font-size:11px;line-height:1.8;color:var(--ink2);background:var(--w);}
+/* グレー背景ボックス */
+.ot-box-gray{border:1px solid var(--rule);padding:4mm 5mm;font-size:11px;line-height:1.8;color:var(--ink2);background:var(--bg);}
+/* 上太罫ボックス（クラシックコンサル定番） */
+.ot-box-top {border:1px solid var(--rule);border-top:2.5px solid var(--navy);padding:4mm 5mm;font-size:11px;line-height:1.8;color:var(--ink2);background:var(--w);}
+/* 上細罫ボックス（数字強調用） */
+.ot-box-rule{border-top:1px solid var(--rule);padding:3mm 0 0;font-size:11px;line-height:1.8;color:var(--ink2);}
+/* ネイビー背景（反転） */
+.ot-box-inv {background:var(--navy);padding:4mm 5mm;font-size:11px;line-height:1.8;color:#fff;}
+/* 二重枠 */
+.ot-box-dbl {border:2px solid var(--navy);padding:4mm 5mm;font-size:11px;line-height:1.8;color:var(--ink2);background:var(--w);}
+
+/* ─ Chip / Session ─ */
+.ot-chip    {background:var(--chip-bg);border:1px solid var(--rule);border-top:2px solid var(--navy);padding:2.5mm 3mm;font-size:9px;line-height:1.55;color:var(--ink2);}
+.ot-chip-lt {background:var(--w);border:1px solid var(--rule);padding:2.5mm 3mm;font-size:9px;line-height:1.55;color:var(--ink2);}
+
+/* ─ Inline node / callout ─ */
+.ot-node    {border:1px solid var(--rule);padding:1.5mm 3mm;font-size:10px;font-weight:700;color:var(--navy);background:var(--w);display:inline-flex;align-items:center;}
+.ot-node-fill{background:var(--navy);padding:1.5mm 3mm;font-size:10px;font-weight:700;color:#fff;display:inline-flex;align-items:center;}
+
+/* ─ Divider / Rule ─ */
+.ot-rule    {border-top:1px solid var(--rule);display:block;}
+.ot-rule-bold{border-top:2px solid var(--navy);display:block;}
+
+/* ─ Mentor bar ─ */
+.ot-mentor  {border:1px solid var(--rule);padding:2.5mm 4mm;font-size:10px;line-height:1.65;color:var(--ink2);display:flex;align-items:center;background:var(--w);}
+
+/* ─ Chevron (month) — simplified classic ─ */
+.ot-mc      {background:var(--navy);color:#fff;font-weight:800;font-size:11px;display:flex;align-items:center;padding:0 3mm 0 5mm;clip-path:polygon(0 0,calc(100% - 4mm) 0,100% 50%,calc(100% - 4mm) 100%,0 100%);}
+.ot-mc-lt   {background:var(--bg);color:var(--ink2);font-weight:800;font-size:11px;display:flex;align-items:center;padding:0 3mm 0 7mm;border:1px solid var(--rule);clip-path:polygon(0 0,100% 0,100% 100%,0 100%,4mm 50%);}
+
+/* ─ Helper typography ─ */
+.chip-h     {font-weight:800;color:var(--navy);font-size:8.5px;letter-spacing:.03em;margin-bottom:1mm;}
+.box-h      {font-weight:800;color:var(--navy);font-size:11.5px;margin-bottom:2mm;padding-bottom:1.5mm;border-bottom:1px solid var(--rule2);}
+ul.cl       {list-style:none;padding:0;}
+ul.cl li    {padding-left:1.4em;position:relative;margin-bottom:1.3mm;font-size:11px;line-height:1.7;color:var(--ink2);}
+ul.cl li::before{content:"";position:absolute;left:0;top:.7em;width:4px;height:1px;background:var(--navy);}
+table.tbl   {width:100%;border-collapse:collapse;font-size:10.5px;}
+table.tbl th{background:var(--navy);color:#fff;text-align:left;padding:2mm 3mm;font-weight:700;font-size:9.5px;letter-spacing:.02em;}
+table.tbl td{padding:2.2mm 3mm;border-bottom:1px solid var(--rule2);color:var(--ink2);vertical-align:top;line-height:1.65;}
+table.tbl tr:nth-child(even) td{background:var(--bgw);}
+.sev        {border:1px solid var(--rule);padding:1.5mm 2mm;font-size:8.5px;line-height:1.6;color:var(--ink2);background:var(--w);}
+.sev b      {font-weight:800;color:var(--navy);display:block;font-size:8px;margin-bottom:.4mm;}
+.meta-item  {font-size:11.5px;color:var(--ink2);}
+.meta-item .lbl{display:block;font-size:8px;letter-spacing:.14em;color:var(--ink3);font-weight:700;margin-bottom:.8mm;}
+
+/* ─ Theme cards ─ */
+.theme-card{background:rgba(255,255,255,.06);border-radius:6px;padding:8px;cursor:pointer;border:2px solid transparent;transition:border-color .15s;}
+.theme-card:hover{background:rgba(255,255,255,.12);}
+.theme-card.active{border-color:#60a5fa;}
+.tc-preview{background:#fff;border-radius:3px;padding:5px;margin-bottom:6px;height:55px;overflow:hidden;}
+.tc-name{color:rgba(255,255,255,.75);font-size:10px;font-weight:700;text-align:center;}
+
+/* ── Print ── */
+@page{size:297mm 210mm;margin:0;}
+@media print{
+  #appbar,#sel-bar,.rh,.obj-handles{display:none!important;}
+  #slides-area{padding:0;gap:0;background:none;}
+  .page-wrap{margin:0;}
+  .slide{width:297mm!important;height:210mm!important;transform:none!important;page-break-after:always;break-after:page;box-shadow:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Appbar ── -->
+<div id="appbar">
+  <span class="logo">✦ Allerise</span>
+  <div class="sep"></div>
+  <button class="tb-btn" onclick="addObj('text')">＋ テキスト</button>
+  <select onchange="addObjStyled(this.value);this.value=''" title="ボックス追加">
+    <option value="">＋ ボックス ▾</option>
+    <option value="box">薄枠ボックス</option>
+    <option value="box-gray">グレーボックス</option>
+    <option value="box-top">上太罫ボックス</option>
+    <option value="box-dbl">二重枠ボックス</option>
+    <option value="box-inv">反転（ネイビー）</option>
+    <option value="box-rule">上細罫のみ</option>
+  </select>
+  <button class="tb-btn" onclick="addObj('chip')">＋ セッション</button>
+  <button class="tb-btn" onclick="addObj('node')">＋ ノード</button>
+  <button class="tb-btn" onclick="addObj('rule')">＋ 区切り線</button>
+  <div class="sep"></div>
+  <select onchange="addPage(this.value);this.value=''" title="ページ追加">
+    <option value="">＋ ページ ▾</option>
+    <option value="blank">白紙</option>
+    <option value="content">コンテンツ（見出し＋本文）</option>
+    <option value="twocol">2カラム</option>
+    <option value="section">セクション区切り</option>
+  </select>
+  <div class="sep"></div>
+  <button class="tb-btn" onclick="adjustZoom(-0.1)">－</button>
+  <span id="zoom-label">100%</span>
+  <button class="tb-btn" onclick="adjustZoom(0.1)">＋</button>
+  <button class="tb-btn" onclick="fitZoom()">フィット</button>
+  <div class="sep"></div>
+  <button class="tb-btn pri" onclick="window.print()">🖨 印刷</button>
+  <button class="tb-btn" onclick="saveHTML()">💾 保存</button>
+  <button class="tb-btn" onclick="toggleThemePanel()" id="theme-btn">🎨 テーマ</button>
+  <span class="hint">クリック→選択 · ドラッグ→移動 · ダブルクリック→編集 · Delete→削除</span>
+</div>
+
+<!-- ── Theme panel ── -->
+<div id="theme-panel" style="display:none;position:fixed;top:52px;right:12px;z-index:9100;background:#1e293b;border-radius:10px;padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,.5);width:300px;">
+  <div style="color:#fff;font-size:11px;font-weight:700;letter-spacing:.12em;margin-bottom:10px;">テーマを選ぶ</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+
+    <div class="theme-card" onclick="setTheme('')" id="tc-default">
+      <div class="tc-preview">
+        <div style="height:5px;background:#0A1B5E;margin-bottom:5px;"></div>
+        <div style="font-size:6px;font-weight:800;color:#0A1B5E;margin-bottom:3px;">見出し</div>
+        <div style="height:1px;background:#C8CEDE;margin-bottom:4px;"></div>
+        <div style="height:28px;border:1px solid #C8CEDE;border-top:2px solid #0A1B5E;padding:3px;"><span style="font-size:5px;color:#333;">ボックス内テキスト</span></div>
+      </div>
+      <div class="tc-name">Classic Navy</div>
+    </div>
+
+    <div class="theme-card" onclick="setTheme('charcoal')" id="tc-charcoal">
+      <div class="tc-preview">
+        <div style="height:5px;background:#1C2432;margin-bottom:5px;"></div>
+        <div style="font-size:6px;font-weight:800;color:#1C2432;margin-bottom:3px;">見出し</div>
+        <div style="height:1px;background:#C4C8D0;margin-bottom:4px;"></div>
+        <div style="height:28px;border:1px solid #C4C8D0;border-top:2px solid #1C2432;padding:3px;"><span style="font-size:5px;color:#333;">ボックス内テキスト</span></div>
+      </div>
+      <div class="tc-name">Charcoal</div>
+    </div>
+
+    <div class="theme-card" onclick="setTheme('forest')" id="tc-forest">
+      <div class="tc-preview">
+        <div style="height:5px;background:#1A3A2A;margin-bottom:5px;"></div>
+        <div style="font-size:6px;font-weight:800;color:#1A3A2A;margin-bottom:3px;">見出し</div>
+        <div style="height:1px;background:#B8CCBF;margin-bottom:4px;"></div>
+        <div style="height:28px;border:1px solid #B8CCBF;border-top:2px solid #1A3A2A;padding:3px;"><span style="font-size:5px;color:#333;">ボックス内テキスト</span></div>
+      </div>
+      <div class="tc-name">Forest Green</div>
+    </div>
+
+    <div class="theme-card" onclick="setTheme('burgundy')" id="tc-burgundy">
+      <div class="tc-preview">
+        <div style="height:5px;background:#4A1628;margin-bottom:5px;"></div>
+        <div style="font-size:6px;font-weight:800;color:#4A1628;margin-bottom:3px;">見出し</div>
+        <div style="height:1px;background:#D0B8C0;margin-bottom:4px;"></div>
+        <div style="height:28px;border:1px solid #D0B8C0;border-top:2px solid #4A1628;padding:3px;"><span style="font-size:5px;color:#333;">ボックス内テキスト</span></div>
+      </div>
+      <div class="tc-name">Burgundy</div>
+    </div>
+
+    <div class="theme-card" onclick="setTheme('slate')" id="tc-slate" style="grid-column:1/-1;">
+      <div class="tc-preview" style="height:36px;display:flex;align-items:flex-start;flex-direction:column;justify-content:space-between;">
+        <div style="display:flex;gap:4px;align-items:center;width:100%;">
+          <div style="height:5px;flex:1;background:#2E3A4E;"></div>
+          <div style="font-size:6px;font-weight:800;color:#2E3A4E;">Slate Blue</div>
+        </div>
+        <div style="height:1px;width:100%;background:#BFC8D4;"></div>
+        <div style="height:16px;width:100%;border:1px solid #BFC8D4;border-top:2px solid #2E3A4E;padding:2px;"><span style="font-size:5px;color:#333;">ボックス内テキスト</span></div>
+      </div>
+      <div class="tc-name">Slate Blue</div>
+    </div>
+
+  </div>
+  <!-- Custom color picker -->
+  <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.15);">
+    <div style="color:#fff;font-size:11px;font-weight:700;letter-spacing:.1em;margin-bottom:8px;">カスタムカラー（自動パレット生成）</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <input type="color" id="custom-color" value="#0A1B5E" style="width:38px;height:32px;border:none;background:none;cursor:pointer;padding:0;border-radius:4px;">
+      <div style="flex:1;">
+        <div id="palette-preview" style="display:flex;gap:3px;height:14px;border-radius:3px;overflow:hidden;"></div>
+        <div style="font-size:9px;color:rgba(255,255,255,.4);margin-top:3px;">メインカラーから自動でパレットを生成します</div>
+      </div>
+      <button onclick="applyCustomColor()" style="background:rgba(255,255,255,.15);color:#fff;border:none;padding:5px 10px;border-radius:4px;font-size:10.5px;cursor:pointer;font-weight:700;">適用</button>
+    </div>
+  </div>
+  <div style="margin-top:8px;font-size:10px;color:rgba(255,255,255,.3);">テーマはスライド全体に即時適用されます</div>
+</div>
+
+<!-- ── Selection toolbar ── -->
+<div id="sel-bar">
+  <button onclick="execFmt('bold')"><b>B</b></button>
+  <button onclick="execFmt('italic')"><i>I</i></button>
+  <select onchange="execFmt('fontSize',this.value);this.value=''" title="フォントサイズ">
+    <option value="">サイズ</option>
+    <option value="1">極小</option><option value="2">小</option>
+    <option value="3">中</option><option value="4">大</option>
+    <option value="5">特大</option><option value="7">超大</option>
+  </select>
+  <input type="color" id="txt-color" title="文字色" onchange="execFmt('foreColor',this.value)">
+  <div class="sb-sep"></div>
+  <select id="style-picker" onchange="switchStyle(this.value)" title="オブジェクトスタイル変更">
+    <option value="">スタイル変更</option>
+    <option value="ot-plain">テキスト（普通）</option>
+    <option value="ot-h1">見出し H1</option>
+    <option value="ot-h2">見出し H2</option>
+    <option value="ot-h3">見出し H3</option>
+    <option value="ot-kicker">キッカー（英字）</option>
+    <option value="ot-brand">ブランド名</option>
+    <option value="ot-price">金額</option>
+    <option value="ot-caption">キャプション</option>
+    <option value="">── ボックス ──</option>
+    <option value="ot-box">薄枠ボックス</option>
+    <option value="ot-box-gray">グレーボックス</option>
+    <option value="ot-box-top">上太罫ボックス</option>
+    <option value="ot-box-dbl">二重枠ボックス</option>
+    <option value="ot-box-inv">反転（ネイビー）</option>
+    <option value="ot-box-rule">上細罫のみ</option>
+    <option value="">── その他 ──</option>
+    <option value="ot-chip">セッションチップ</option>
+    <option value="ot-chip-lt">ライトチップ</option>
+    <option value="ot-node">ノード（枠）</option>
+    <option value="ot-node-fill">ノード（塗り）</option>
+    <option value="ot-mentor">メンタリングバー</option>
+  </select>
+  <div class="sb-sep"></div>
+  <button onclick="dupeSel()">複製</button>
+  <button onclick="bringFwd()">前面</button>
+  <button onclick="sendBack()">背面</button>
+  <button class="sb-del" onclick="deleteSel()">✕ 削除</button>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDES
+══════════════════════════════════════ -->
+<div id="slides-area">
+
+<!-- ═══ SLIDE 1: COVER ═══ -->
+<div class="page-wrap">
+<div class="slide" id="s1">
+  <div class="slide-topbar"></div>
+
+  <!-- Client company name -->
+  <div class="obj" style="left:24mm;top:50mm;width:249mm;height:10mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh n"></div><div class="rh ne"></div><div class="rh e"></div><div class="rh se"></div><div class="rh s"></div><div class="rh sw"></div><div class="rh w"></div></div>
+    <div class="obj-inner ot-kicker" style="font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.2em;">株式会社ポピンズシッター　御中</div>
+  </div>
+
+  <!-- Rule under client name -->
+  <div class="obj" style="left:24mm;top:63mm;width:249mm;height:1mm;" data-lock="1">
+    <div class="obj-inner ot-rule-bold"></div>
+  </div>
+
+  <!-- Proposal title -->
+  <div class="obj" style="left:24mm;top:70mm;width:249mm;height:46mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh n"></div><div class="rh ne"></div><div class="rh e"></div><div class="rh se"></div><div class="rh s"></div><div class="rh sw"></div><div class="rh w"></div></div>
+    <div class="obj-inner ot-h1" style="font-size:32px;">リーダー戦略策定力<br>伴走プログラムのご提案</div>
+  </div>
+
+  <!-- Bottom rule -->
+  <div class="obj" style="left:24mm;top:157mm;width:249mm;height:1mm;" data-lock="1">
+    <div class="obj-inner ot-rule"></div>
+  </div>
+
+  <!-- Our name -->
+  <div class="obj" style="left:24mm;top:162mm;width:180mm;height:8mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh n"></div><div class="rh ne"></div><div class="rh e"></div><div class="rh se"></div><div class="rh s"></div><div class="rh sw"></div><div class="rh w"></div></div>
+    <div class="obj-inner" style="font-size:12px;font-weight:800;color:var(--navy);letter-spacing:.22em;">ALLERISE PTE. LTD.</div>
+  </div>
+
+  <!-- Date -->
+  <div class="obj" style="left:24mm;top:172mm;width:120mm;height:8mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-plain" style="color:var(--ink3);">2026年9月</div>
+  </div>
+
+  <div class="slide-footer"><span></span><span>Confidential · Allerise Pte. Ltd.</span></div>
+</div>
+</div>
+
+<!-- ═══ SLIDE 2: なぜ今か ═══ -->
+<div class="page-wrap">
+<div class="slide" id="s2">
+  <div class="slide-topbar"></div>
+
+  <div class="obj" style="left:20mm;top:13mm;width:240mm;height:5mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-kicker">01 — Background &amp; Purpose</div>
+  </div>
+  <div class="obj" style="left:20mm;top:17.5mm;width:240mm;height:9mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-h2">今の課題と目指す状態</div>
+  </div>
+  <div class="obj" style="left:263mm;top:13mm;width:16mm;height:5mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-caption">02 / 05</div>
+  </div>
+
+  <!-- Rule under heading -->
+  <div class="obj" style="left:20mm;top:28mm;width:257mm;height:1mm;" data-lock="1">
+    <div class="obj-inner ot-rule"></div>
+  </div>
+
+  <!-- Issue chain nodes — all fully moveable/deletable -->
+  <div class="obj" style="left:20mm;top:32mm;width:55mm;height:8mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh n"></div><div class="rh ne"></div><div class="rh e"></div><div class="rh se"></div><div class="rh s"></div><div class="rh sw"></div><div class="rh w"></div></div>
+    <div class="obj-inner ot-node" style="width:100%;height:100%;justify-content:center;">全社方針が部門に落とせない</div>
+  </div>
+  <div class="obj" style="left:77mm;top:32mm;width:8mm;height:8mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner" style="font-size:16px;color:var(--navy);display:flex;align-items:center;justify-content:center;">→</div>
+  </div>
+  <div class="obj" style="left:87mm;top:32mm;width:40mm;height:8mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-node" style="width:100%;height:100%;justify-content:center;">思いつきの打ち手</div>
+  </div>
+  <div class="obj" style="left:129mm;top:32mm;width:8mm;height:8mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner" style="font-size:16px;color:var(--navy);display:flex;align-items:center;justify-content:center;">→</div>
+  </div>
+  <div class="obj" style="left:139mm;top:32mm;width:44mm;height:8mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-node" style="width:100%;height:100%;justify-content:center;">マイクロなタスクに終始</div>
+  </div>
+  <div class="obj" style="left:185mm;top:32mm;width:8mm;height:8mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner" style="font-size:16px;color:var(--navy);display:flex;align-items:center;justify-content:center;">→</div>
+  </div>
+  <div class="obj" style="left:195mm;top:32mm;width:40mm;height:8mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-node" style="width:100%;height:100%;justify-content:center;">戦略が形骸化する</div>
+  </div>
+
+  <!-- 2 columns — larger since no summary text -->
+  <div class="obj" style="left:20mm;top:44mm;width:129mm;height:122mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh n"></div><div class="rh ne"></div><div class="rh e"></div><div class="rh se"></div><div class="rh s"></div><div class="rh sw"></div><div class="rh w"></div></div>
+    <div class="obj-inner ot-box-top">
+      <div class="box-h">今の課題</div>
+      <ul class="cl">
+        <li>全社の3年後の方向性と、自部門のやることがつながっていない</li>
+        <li>「何をしないといけないか」が思いつきの施策列挙になる</li>
+        <li>人・お金・時間を自分で考慮できず、計画が絵に描いた餅になる</li>
+        <li>「まとめる役割」を上長が担い続けている状態</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="obj" style="left:155mm;top:44mm;width:122mm;height:122mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh n"></div><div class="rh ne"></div><div class="rh e"></div><div class="rh se"></div><div class="rh s"></div><div class="rh sw"></div><div class="rh w"></div></div>
+    <div class="obj-inner ot-box-top">
+      <div class="box-h">目指す状態（11月末）</div>
+      <ul class="cl">
+        <li>全社の長期方針から自部門の役割・戦略を自分で導き出せる</li>
+        <li>「思いつき」ではなく根拠のある優先順位で施策を選べる</li>
+        <li>人・お金・時間の配分を戦略として自分で設計できる</li>
+        <li>部門戦略文書（約10P）を自分でまとめて経営陣に提示できる</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-footer"><span><b>Allerise</b></span><span>Confidential</span></div>
+</div>
+</div>
+
+<!-- ═══ SLIDE 3: プログラム設計 ═══ -->
+<div class="page-wrap">
+<div class="slide" id="s3">
+  <div class="slide-topbar"></div>
+
+  <div class="obj" style="left:20mm;top:13mm;width:240mm;height:5mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-kicker">02 — Program Design</div>
+  </div>
+  <div class="obj" style="left:20mm;top:17mm;width:240mm;height:9mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-h2">プログラムの設計</div>
+  </div>
+  <div class="obj" style="left:263mm;top:13mm;width:16mm;height:5mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-caption">03 / 05</div>
+  </div>
+
+  <div class="obj" style="left:20mm;top:28mm;width:257mm;height:1mm;" data-lock="1">
+    <div class="obj-inner ot-rule"></div>
+  </div>
+
+  <!-- Track A label -->
+  <div class="obj" style="left:20mm;top:30mm;width:257mm;height:5mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-caption" style="font-weight:800;color:var(--navy);letter-spacing:.1em;">TRACK A — グループセッション（90分 × 4回）　コンサルスキルを実際の来期戦略に当てはめながら習得</div>
+  </div>
+
+  <!-- 4 session chips -->
+  <div class="obj" style="left:20mm;top:36mm;width:59mm;height:29mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh n"></div><div class="rh ne"></div><div class="rh e"></div><div class="rh se"></div><div class="rh s"></div><div class="rh sw"></div><div class="rh w"></div></div>
+    <div class="obj-inner ot-chip"><div class="chip-h">SESSION 1 · 9月中旬（対面）</div>振り返り × ブレスト<br>BSの効果的な進め方を学びながら昨年を振り返り、現状と課題を共有する</div>
+  </div>
+  <div class="obj" style="left:82mm;top:36mm;width:59mm;height:29mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh n"></div><div class="rh ne"></div><div class="rh e"></div><div class="rh se"></div><div class="rh s"></div><div class="rh sw"></div><div class="rh w"></div></div>
+    <div class="obj-inner ot-chip"><div class="chip-h">SESSION 2 · 9月下旬</div>戦略カスケード<br>全社方針→部門戦略への落とし方。長期視点でゴールを設定する</div>
+  </div>
+  <div class="obj" style="left:144mm;top:36mm;width:59mm;height:29mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh n"></div><div class="rh ne"></div><div class="rh e"></div><div class="rh se"></div><div class="rh s"></div><div class="rh sw"></div><div class="rh w"></div></div>
+    <div class="obj-inner ot-chip"><div class="chip-h">SESSION 3 · 10月中旬</div>戦略と優先順位<br>根拠のある施策の選び方と人・お金・時間の配分設計</div>
+  </div>
+  <div class="obj" style="left:206mm;top:36mm;width:71mm;height:29mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh n"></div><div class="rh ne"></div><div class="rh e"></div><div class="rh se"></div><div class="rh s"></div><div class="rh sw"></div><div class="rh w"></div></div>
+    <div class="obj-inner ot-chip"><div class="chip-h">SESSION 4 · 10月下旬</div>計画の言語化<br>KPI設計と部門戦略文書（約10P）の仕上げ</div>
+  </div>
+
+  <!-- Track B divider label -->
+  <div class="obj" style="left:20mm;top:69mm;width:257mm;height:5mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-caption" style="font-weight:800;color:var(--navy);letter-spacing:.1em;display:flex;align-items:center;gap:3mm;">
+      <span style="flex:1;border-top:1px solid var(--rule);"></span>
+      TRACK B — スケジュール × 個別メンタリング
+      <span style="flex:1;border-top:1px solid var(--rule);"></span>
+    </div>
+  </div>
+
+  <!-- Chevron months -->
+  <div class="obj" style="left:20mm;top:76mm;width:59mm;height:12mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-mc"><b>8月</b><span style="font-size:8px;font-weight:400;opacity:.8;margin-left:2mm;">準備</span></div>
+  </div>
+  <div class="obj" style="left:76mm;top:76mm;width:62mm;height:12mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-mc"><b>9月</b><span style="font-size:8px;font-weight:400;opacity:.8;margin-left:2mm;">現状把握・ゴール</span></div>
+  </div>
+  <div class="obj" style="left:135mm;top:76mm;width:62mm;height:12mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-mc"><b>10月</b><span style="font-size:8px;font-weight:400;opacity:.8;margin-left:2mm;">戦略策定・計画化</span></div>
+  </div>
+  <div class="obj" style="left:194mm;top:76mm;width:83mm;height:12mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-mc-lt"><b>11月</b><span style="font-size:8px;font-weight:400;margin-left:2mm;">成果物・合意</span></div>
+  </div>
+
+  <!-- Schedule cells -->
+  <div class="obj" style="left:20mm;top:90mm;width:54mm;height:43mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh n"></div><div class="rh ne"></div><div class="rh e"></div><div class="rh se"></div><div class="rh s"></div><div class="rh sw"></div><div class="rh w"></div></div>
+    <div class="obj-inner sev" style="height:100%;"><b>事前ブリーフィング</b>全体戦略・組織理解（2〜3h）<br>小栗さん→柳沢</div>
+  </div>
+  <div class="obj" style="left:76mm;top:90mm;width:57mm;height:19mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner sev"><b>Session 1（9月第2週・対面）</b>振り返り×BS · 現状共有</div>
+  </div>
+  <div class="obj" style="left:76mm;top:111mm;width:57mm;height:19mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner sev"><b>Session 2（9月第4週）</b>戦略カスケード · ゴール設定</div>
+  </div>
+  <div class="obj" style="left:135mm;top:90mm;width:57mm;height:19mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner sev"><b>Session 3（10月第2週）</b>戦略・優先順位 · 資源配分</div>
+  </div>
+  <div class="obj" style="left:135mm;top:111mm;width:57mm;height:19mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner sev"><b>Session 4（10月第4週）</b>計画言語化 · 文書ドラフト</div>
+  </div>
+  <div class="obj" style="left:194mm;top:90mm;width:83mm;height:43mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh n"></div><div class="rh ne"></div><div class="rh e"></div><div class="rh se"></div><div class="rh s"></div><div class="rh sw"></div><div class="rh w"></div></div>
+    <div class="obj-inner sev" style="height:100%;"><b>部門戦略文書 提出</b>各部門 約10P<br>経営陣への報告・合意</div>
+  </div>
+
+  <!-- Mentor bar -->
+  <div class="obj" style="left:20mm;top:136mm;width:257mm;height:12mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh n"></div><div class="rh ne"></div><div class="rh e"></div><div class="rh se"></div><div class="rh s"></div><div class="rh sw"></div><div class="rh w"></div></div>
+    <div class="obj-inner ot-mentor"><b style="color:var(--navy);white-space:nowrap;">個別メンタリング（45分 × 隔週 × 5名）</b><span style="margin-left:4mm;color:var(--ink3);font-size:9px;">各自の戦略進捗チェック · 月次定例の準備サポート · 状況に応じて週次対応</span><span style="margin-left:auto;display:flex;gap:1.5mm;flex-shrink:0;"><span style="border:1px solid var(--rule);padding:.8mm 2mm;font-size:8px;font-weight:700;color:var(--navy);">石橋</span><span style="border:1px solid var(--rule);padding:.8mm 2mm;font-size:8px;font-weight:700;color:var(--navy);">筑地</span><span style="border:1px solid var(--rule);padding:.8mm 2mm;font-size:8px;font-weight:700;color:var(--navy);">荒平</span><span style="border:1px solid var(--rule);padding:.8mm 2mm;font-size:8px;font-weight:700;color:var(--navy);">山口</span><span style="border:1px solid var(--rule);padding:.8mm 2mm;font-size:8px;font-weight:700;color:var(--navy);">大坂屋</span></span></div>
+  </div>
+
+  <div class="slide-footer"><span><b>Allerise</b></span><span>Confidential</span></div>
+</div>
+</div>
+
+<!-- ═══ SLIDE 4: 対象5名 ═══ -->
+<div class="page-wrap">
+<div class="slide" id="s4">
+  <div class="slide-topbar"></div>
+  <div class="obj" style="left:20mm;top:13mm;width:240mm;height:5mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-kicker">03 — Participants</div>
+  </div>
+  <div class="obj" style="left:20mm;top:17mm;width:240mm;height:9mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-h2">対象リーダー 5名の現状と伴走方針</div>
+  </div>
+  <div class="obj" style="left:263mm;top:13mm;width:16mm;height:5mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-caption">04 / 05</div>
+  </div>
+  <div class="obj" style="left:20mm;top:28mm;width:257mm;height:1mm;" data-lock="1">
+    <div class="obj-inner ot-rule"></div>
+  </div>
+  <div class="obj" style="left:20mm;top:30mm;width:257mm;height:8mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-plain">各リーダーの現状を踏まえ、個別メンタリングのアプローチを調整します。</div>
+  </div>
+  <div class="obj" style="left:20mm;top:39mm;width:257mm;height:133mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh n"></div><div class="rh ne"></div><div class="rh e"></div><div class="rh se"></div><div class="rh s"></div><div class="rh sw"></div><div class="rh w"></div></div>
+    <div class="obj-inner">
+      <table class="tbl">
+        <tr><th style="width:14%;">氏名 / 部門</th><th style="width:40%;">現在の状況</th><th>伴走の焦点</th></tr>
+        <tr><td>石橋<br><span style="font-weight:400;font-size:8.5px;color:var(--ink3);">事業企画 / M30後半</span></td><td>GM候補として期待大。基礎力はあるが経営レベルの視座へのステップアップが次の課題</td><td>中計・経営視点での戦略言語化。「なぜその施策か」を数字と論理で語れるようにする</td></tr>
+        <tr><td>筑地<br><span style="font-weight:400;font-size:8.5px;color:var(--ink3);">研修育成 / M30後半</span></td><td>成長株。伸びしろ大でモチベーション高い。スピードを保ちながら深さを加えたい</td><td>戦略思考の骨格づくり。勢いを活かしつつ構造的に考える習慣をつける</td></tr>
+        <tr><td>荒平<br><span style="font-weight:400;font-size:8.5px;color:var(--ink3);">CS / AM40代</span></td><td>M候補。個別対応力が強み。チーム全体・組織への視点を広げることが次のテーマ</td><td>チーム設計・組織戦略の視点を加える。個別から全体へのスケール練習</td></tr>
+        <tr><td>山口<br><span style="font-weight:400;font-size:8.5px;color:var(--ink3);">依頼管理 / AM40代</span></td><td>担当範囲の再定義と、オーナーシップを持った意思決定の経験が必要なフェーズ</td><td>自分の役割の再言語化。「何を決める人か」を戦略に落とし込む練習</td></tr>
+        <tr><td>大坂屋<br><span style="font-weight:400;font-size:8.5px;color:var(--ink3);">開発 / M20代</span></td><td>若手リーダー。業務委託EM 2名管理。戦略の全体像が見えにくい状況から出発</td><td>全体俯瞰力と進捗管理。「自分のチームが会社にどう貢献するか」を言語化する</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="obj" style="left:20mm;top:175mm;width:257mm;height:6mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-caption">※各チーム社員5〜6名 · 経営管理は木村さん（業務委託）が担当 · 田村社長との連携は上長経由</div>
+  </div>
+  <div class="slide-footer"><span><b>Allerise</b></span><span>Confidential</span></div>
+</div>
+</div>
+
+<!-- ═══ SLIDE 5: 提案内容・料金 ═══ -->
+<div class="page-wrap">
+<div class="slide" id="s5">
+  <div class="slide-topbar"></div>
+  <div class="obj" style="left:20mm;top:13mm;width:175mm;height:5mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-kicker">04 — Proposal &amp; Fee</div>
+  </div>
+  <div class="obj" style="left:20mm;top:17mm;width:175mm;height:9mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-h2">ご提案内容</div>
+  </div>
+  <div class="obj" style="left:263mm;top:13mm;width:16mm;height:5mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-caption">05 / 05</div>
+  </div>
+  <div class="obj" style="left:20mm;top:28mm;width:257mm;height:1mm;" data-lock="1">
+    <div class="obj-inner ot-rule"></div>
+  </div>
+
+  <!-- Main table -->
+  <div class="obj" style="left:20mm;top:30mm;width:179mm;height:150mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh n"></div><div class="rh ne"></div><div class="rh e"></div><div class="rh se"></div><div class="rh s"></div><div class="rh sw"></div><div class="rh w"></div></div>
+    <div class="obj-inner">
+      <table class="tbl">
+        <tr><th>項目</th><th>内容</th></tr>
+        <tr><td>プログラム名</td><td>リーダー戦略策定力 伴走プログラム</td></tr>
+        <tr><td>対象</td><td>管理職・リーダー5名（石橋・筑地・荒平・山口・大坂屋）</td></tr>
+        <tr><td>期間</td><td>2026年9月〜11月（約3ヶ月）</td></tr>
+        <tr><td>グループセッション</td><td>90分 × 4回｜Session 1は対面、以降オンライン</td></tr>
+        <tr><td>個別メンタリング</td><td>45分 × 隔週（状況に応じて週次）× 5名｜月次定例準備サポートを含む</td></tr>
+        <tr><td>含むもの</td><td>事前ブリーフィング（2〜3h）· 各回資料 · 宿題フィードバック</td></tr>
+        <tr><td>成果物</td><td>来年度部門戦略文書（約10P / 部門）× 5部門｜11月提出</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Price box -->
+  <div class="obj" style="left:204mm;top:30mm;width:73mm;height:42mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh n"></div><div class="rh ne"></div><div class="rh e"></div><div class="rh se"></div><div class="rh s"></div><div class="rh sw"></div><div class="rh w"></div></div>
+    <div class="obj-inner ot-box-dbl" style="text-align:center;">
+      <div style="font-size:11px;font-weight:800;color:var(--navy);margin-bottom:2.5mm;letter-spacing:.04em;">プログラム総額</div>
+      <div class="ot-price">¥1,900,000</div>
+      <div style="font-size:9px;color:var(--ink3);margin-top:1.5mm;">税別 · 3ヶ月一式・上記全込み</div>
+      <div style="font-size:9px;color:var(--ink3);margin-top:1mm;">1名あたり ¥380,000 / 3ヶ月</div>
+    </div>
+  </div>
+
+  <!-- Bio box -->
+  <div class="obj" style="left:204mm;top:76mm;width:73mm;height:102mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh n"></div><div class="rh ne"></div><div class="rh e"></div><div class="rh se"></div><div class="rh s"></div><div class="rh sw"></div><div class="rh w"></div></div>
+    <div class="obj-inner ot-box">
+      <div class="box-h">ファシリテーター</div>
+      <div style="font-weight:800;color:var(--navy);font-size:11px;margin-bottom:1.5mm;">柳沢 紀子</div>
+      <div style="font-size:10px;line-height:1.75;color:var(--ink2);"><b>Allerise Pte. Ltd. 代表</b><br>慶應義塾大学 法学部<br>アクセンチュア戦略本部・Red Bull Japan・オイシックスにて戦略・新規事業を経験。現在はシンガポールを拠点に、企業の戦略策定支援・管理職育成を行う。</div>
+    </div>
+  </div>
+
+  <!-- CTA note -->
+  <div class="obj" style="left:204mm;top:182mm;width:73mm;height:7mm;">
+    <div class="obj-handles"><div class="rh nw"></div><div class="rh ne"></div><div class="rh se"></div><div class="rh sw"></div></div>
+    <div class="obj-inner ot-caption">内容・スケジュールは柔軟に対応いたします。</div>
+  </div>
+
+  <div class="slide-footer"><span><b>Allerise</b></span><span>© Noriko Yanagisawa · Confidential</span></div>
+</div>
+</div>
+
+</div><!-- #slides-area -->
+
+<script>
+/* ───── State ───── */
+let selEl = null, zoom = 1, dragState = null, mmPx = 3.7795;
+
+/* ───── Calibrate mm ───── */
+(function(){
+  const d = Object.assign(document.createElement('div'),{style:'position:absolute;width:100mm;height:1px;visibility:hidden;'});
+  document.body.appendChild(d); mmPx = d.offsetWidth/100; document.body.removeChild(d);
+})();
+
+/* ───── Zoom ───── */
+function applyZoom(){
+  document.querySelectorAll('.slide').forEach(s=>s.style.transform=`scale(${zoom})`);
+  document.querySelectorAll('.page-wrap').forEach(pw=>{
+    const s=pw.querySelector('.slide');
+    pw.style.height=(s.offsetHeight*zoom)+'px';
+  });
+  document.getElementById('zoom-label').textContent=Math.round(zoom*100)+'%';
+}
+function adjustZoom(d){zoom=Math.max(0.3,Math.min(1.5,zoom+d));applyZoom();}
+function fitZoom(){
+  const vw=window.innerWidth-40;
+  const sw=document.querySelector('.slide').offsetWidth;
+  zoom=Math.min(1,vw/sw); applyZoom();
+}
+window.addEventListener('resize',fitZoom);
+
+/* ───── Selection ───── */
+function select(el){
+  deselect();
+  if(!el||el.dataset.lock)return;
+  selEl=el; el.classList.add('sel');
+  posSelBar(el);
+}
+function deselect(){
+  if(!selEl)return;
+  stopEdit(selEl); selEl.classList.remove('sel'); selEl=null;
+  document.getElementById('sel-bar').style.display='none';
+}
+function posSelBar(el){
+  const sb=document.getElementById('sel-bar');
+  const r=el.getBoundingClientRect();
+  sb.style.display='flex';
+  const sbH=sb.offsetHeight||36;
+  let top=r.top-sbH-8; if(top<50)top=r.bottom+8;
+  sb.style.top=top+'px';
+  sb.style.left=Math.max(8,Math.min(r.left,window.innerWidth-440))+'px';
+}
+
+/* ───── Edit ───── */
+function startEdit(el){
+  const i=el.querySelector('.obj-inner'); if(!i)return;
+  i.contentEditable='true'; el.classList.add('editing');
+  i.focus();
+  const rng=document.createRange(); rng.selectNodeContents(i); rng.collapse(false);
+  const sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(rng);
+}
+function stopEdit(el){
+  if(!el)return;
+  const i=el.querySelector('.obj-inner'); if(i)i.contentEditable='false';
+  el.classList.remove('editing');
+}
+
+/* ───── Actions ───── */
+function deleteSel(){if(selEl){selEl.remove();selEl=null;document.getElementById('sel-bar').style.display='none';}}
+function dupeSel(){
+  if(!selEl)return;
+  const c=selEl.cloneNode(true);
+  c.style.left=(parseFloat(selEl.style.left)+5)+'mm';
+  c.style.top=(parseFloat(selEl.style.top)+5)+'mm';
+  selEl.parentNode.appendChild(c); initObj(c); select(c);
+}
+function bringFwd(){if(selEl){selEl.style.zIndex=(parseInt(selEl.style.zIndex||0)+1);}}
+function sendBack(){if(selEl){selEl.style.zIndex=Math.max(0,parseInt(selEl.style.zIndex||0)-1);}}
+function execFmt(cmd,val){document.execCommand(cmd,false,val||null);}
+
+/* ───── Style switcher ───── */
+function switchStyle(cls){
+  if(!selEl||!cls)return;
+  const inner=selEl.querySelector('.obj-inner'); if(!inner)return;
+  // strip all ot-* classes
+  [...inner.classList].filter(c=>c.startsWith('ot-')||c==='sev'||c==='meta-item').forEach(c=>inner.classList.remove(c));
+  if(cls)inner.classList.add(cls);
+  document.getElementById('style-picker').value='';
+}
+
+/* ───── Drag / Resize ───── */
+function pxToMm(px){return px/mmPx/zoom;}
+
+/* ── Snap guides ── */
+function getGuideContainer(el){
+  const slide=el.closest('.slide'); if(!slide)return null;
+  let gc=slide.querySelector('.guide-container');
+  if(!gc){gc=document.createElement('div');gc.className='guide-container';gc.style.cssText='position:absolute;inset:0;pointer-events:none;z-index:200;overflow:hidden;';slide.appendChild(gc);}
+  return gc;
+}
+function clearGuides(el){const gc=getGuideContainer(el);if(gc)gc.innerHTML='';}
+function showSnap(el,slide){
+  const gc=getGuideContainer(el); if(!gc)return;
+  gc.innerHTML='';
+  const SNAP=1.5; // mm threshold to show guide
+  const elL=parseFloat(el.style.left),elT=parseFloat(el.style.top);
+  const elR=elL+parseFloat(el.style.width||0),elB=elT+parseFloat(el.style.height||0);
+  const elCx=(elL+elR)/2, elCy=(elT+elB)/2;
+  let snapL=null,snapT=null;
+  slide.querySelectorAll('.obj').forEach(o=>{
+    if(o===el||o.dataset.lock)return;
+    const oL=parseFloat(o.style.left),oT=parseFloat(o.style.top);
+    const oR=oL+parseFloat(o.style.width||0),oB=oT+parseFloat(o.style.height||0);
+    const oCx=(oL+oR)/2, oCy=(oT+oB)/2;
+    const checks=[
+      [Math.abs(elL-oL),'v',oL],[Math.abs(elL-oR),'v',oR],[Math.abs(elL-oCx),'v',oCx],
+      [Math.abs(elR-oL),'v',oL],[Math.abs(elR-oR),'v',oR],[Math.abs(elCx-oCx),'v',oCx],
+      [Math.abs(elT-oT),'h',oT],[Math.abs(elT-oB),'h',oB],[Math.abs(elT-oCy),'h',oCy],
+      [Math.abs(elB-oT),'h',oT],[Math.abs(elB-oB),'h',oB],[Math.abs(elCy-oCy),'h',oCy],
+    ];
+    checks.forEach(([dist,type,pos])=>{
+      if(dist>SNAP)return;
+      const line=document.createElement('div');
+      if(type==='v'){
+        line.style.cssText=`position:absolute;top:0;bottom:0;left:${pos}mm;width:1px;background:#f43f5e;`;
+        if(snapL===null)snapL=pos;
+      } else {
+        line.style.cssText=`position:absolute;left:0;right:0;top:${pos}mm;height:1px;background:#f43f5e;`;
+        if(snapT===null)snapT=pos;
+      }
+      gc.appendChild(line);
+    });
+  });
+  // Snap: adjust position
+  if(snapL!==null){
+    const curR=elL+parseFloat(el.style.width||0);
+    if(Math.abs(elL-snapL)<SNAP)el.style.left=snapL+'mm';
+    else if(Math.abs(curR-snapL)<SNAP)el.style.left=(snapL-parseFloat(el.style.width||0))+'mm';
+    else if(Math.abs((elL+curR)/2-snapL)<SNAP)el.style.left=(snapL-parseFloat(el.style.width||0)/2)+'mm';
+  }
+  if(snapT!==null){
+    const curB=elT+parseFloat(el.style.height||0);
+    if(Math.abs(elT-snapT)<SNAP)el.style.top=snapT+'mm';
+    else if(Math.abs(curB-snapT)<SNAP)el.style.top=(snapT-parseFloat(el.style.height||0))+'mm';
+    else if(Math.abs((elT+curB)/2-snapT)<SNAP)el.style.top=(snapT-parseFloat(el.style.height||0)/2)+'mm';
+  }
+}
+
+document.addEventListener('mousemove',e=>{
+  if(!dragState)return;
+  const dx=pxToMm(e.clientX-dragState.startX);
+  const dy=pxToMm(e.clientY-dragState.startY);
+  const el=dragState.el;
+  if(dragState.type==='move'){
+    dragState.moved=true;
+    el.style.left=Math.max(0,dragState.origL+dx)+'mm';
+    el.style.top=Math.max(0,dragState.origT+dy)+'mm';
+    const slide=el.closest('.slide');
+    if(slide)showSnap(el,slide);
+    if(selEl===el)posSelBar(el);
+  } else if(dragState.type==='resize'){
+    const h=dragState.handle;
+    let l=dragState.origL,t=dragState.origT,w=dragState.origW,ht=dragState.origH;
+    if(h.includes('e')){w=Math.max(5,w+dx);}
+    if(h.includes('s')){ht=Math.max(3,ht+dy);}
+    if(h.includes('w')){const nw=Math.max(5,w-dx);l=l+(w-nw);w=nw;}
+    if(h.includes('n')){const nh=Math.max(3,ht-dy);t=t+(ht-nh);ht=nh;}
+    el.style.left=l+'mm';el.style.top=t+'mm';
+    el.style.width=w+'mm';el.style.height=ht+'mm';
+    if(selEl===el)posSelBar(el);
+  }
+});
+document.addEventListener('mouseup',()=>{
+  if(dragState&&dragState.el)clearGuides(dragState.el);
+  dragState=null;
+});
+
+function onMouseDown(e){
+  const obj=e.currentTarget;
+  if(obj.dataset.lock)return;
+  if(e.target.classList.contains('rh')){
+    e.preventDefault();e.stopPropagation();
+    if(selEl!==obj)select(obj);
+    const hPos=['nw','n','ne','e','se','s','sw','w'].find(p=>e.target.classList.contains(p));
+    dragState={type:'resize',handle:hPos,startX:e.clientX,startY:e.clientY,
+      origL:parseFloat(obj.style.left),origT:parseFloat(obj.style.top),
+      origW:parseFloat(obj.style.width),origH:parseFloat(obj.style.height),el:obj};
+    return;
+  }
+  if(obj.classList.contains('editing'))return;
+  e.preventDefault();
+  select(obj);
+  dragState={type:'move',startX:e.clientX,startY:e.clientY,
+    origL:parseFloat(obj.style.left),origT:parseFloat(obj.style.top),
+    el:obj,moved:false};
+}
+function onDblClick(e){
+  const obj=e.currentTarget;
+  if(obj.dataset.lock)return;
+  if(selEl!==obj)select(obj);
+  startEdit(obj);
+  e.preventDefault();
+}
+
+/* ───── Slide bg click → deselect ───── */
+document.querySelectorAll('.slide').forEach(s=>{
+  s.addEventListener('mousedown',e=>{
+    if(e.target===s||e.target.classList.contains('slide-topbar')||e.target.classList.contains('slide-footer'))deselect();
+  });
+});
+
+/* ───── Keyboard ───── */
+document.addEventListener('keydown',e=>{
+  if(selEl&&selEl.classList.contains('editing'))return;
+  if((e.key==='Delete'||e.key==='Backspace')&&selEl){e.preventDefault();deleteSel();}
+  if(e.key==='Escape')deselect();
+  if((e.metaKey||e.ctrlKey)&&e.key==='s'){e.preventDefault();saveHTML();}
+  if((e.metaKey||e.ctrlKey)&&e.key==='d'&&selEl){e.preventDefault();dupeSel();}
+  if(selEl&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){
+    e.preventDefault();
+    const step=e.shiftKey?5:1;
+    const l=parseFloat(selEl.style.left||0);
+    const t=parseFloat(selEl.style.top||0);
+    if(e.key==='ArrowLeft')selEl.style.left=(l-step)+'mm';
+    if(e.key==='ArrowRight')selEl.style.left=(l+step)+'mm';
+    if(e.key==='ArrowUp')selEl.style.top=(t-step)+'mm';
+    if(e.key==='ArrowDown')selEl.style.top=(t+step)+'mm';
+    posSelBar(selEl);
+  }
+});
+
+/* ───── Init objects ───── */
+function initObj(el){
+  if(el.dataset.lock)return;
+  el.addEventListener('mousedown',onMouseDown);
+  el.addEventListener('dblclick',onDblClick);
+  const inner=el.querySelector('.obj-inner');
+  if(inner)inner.contentEditable='false';
+}
+document.querySelectorAll('.obj').forEach(initObj);
+
+/* ───── Add new objects ───── */
+const HANDLES='<div class="obj-handles"><div class="rh nw"></div><div class="rh n"></div><div class="rh ne"></div><div class="rh e"></div><div class="rh se"></div><div class="rh s"></div><div class="rh sw"></div><div class="rh w"></div></div>';
+function getSlide(){
+  for(const s of document.querySelectorAll('.slide')){
+    const r=s.getBoundingClientRect();
+    if(r.top<window.innerHeight&&r.bottom>46)return s;
+  }
+  return document.querySelector('.slide');
+}
+function makeObj(html,style,innerCls){
+  const slide=getSlide();
+  const el=document.createElement('div');
+  el.className='obj';
+  el.style.cssText=style||'left:40mm;top:40mm;width:80mm;height:20mm;';
+  el.innerHTML=HANDLES+`<div class="obj-inner ${innerCls||''}">${html}</div>`;
+  slide.appendChild(el); initObj(el); select(el); return el;
+}
+function addObj(type){
+  const map={
+    text:  ['テキストを入力してください','left:40mm;top:50mm;width:100mm;height:12mm;','ot-plain'],
+    chip:  ['<div class="chip-h">SESSION N · 月</div>テーマ・内容を入力','left:40mm;top:50mm;width:62mm;height:25mm;','ot-chip'],
+    node:  ['ノードテキスト','left:40mm;top:50mm;width:55mm;height:8mm;','ot-node'],
+    rule:  ['','left:20mm;top:50mm;width:257mm;height:1mm;','ot-rule'],
+  };
+  const [html,style,cls]=map[type]||map.text;
+  const el=makeObj(html,style,cls);
+  if(type!=='rule')startEdit(el);
+}
+function addObjStyled(boxType){
+  if(!boxType)return;
+  const el=makeObj('<div class="box-h">見出しを入力</div><ul class="cl"><li>項目1</li><li>項目2</li></ul>',
+    'left:40mm;top:50mm;width:100mm;height:50mm;', 'ot-'+boxType);
+}
+
+/* ───── Save ───── */
+function saveHTML(){
+  deselect();
+  const html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+  const a=Object.assign(document.createElement('a'),{
+    href:URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'})),
+    download:'poppins-proposal.html'
+  });
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+fitZoom();
+
+/* ───── Custom color palette ───── */
+function hexToHsl(hex){
+  let r=parseInt(hex.slice(1,3),16)/255, g=parseInt(hex.slice(3,5),16)/255, b=parseInt(hex.slice(5,7),16)/255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b); let h,s,l=(max+min)/2;
+  if(max===min){h=s=0;}else{
+    const d=max-min; s=l>0.5?d/(2-max-min):d/(max+min);
+    switch(max){case r:h=((g-b)/d+(g<b?6:0))/6;break;case g:h=((b-r)/d+2)/6;break;default:h=((r-g)/d+4)/6;}
+  }
+  return[h*360,s*100,l*100];
+}
+function hslToHex(h,s,l){
+  s/=100;l/=100;
+  const a=s*Math.min(l,1-l);
+  const f=n=>{const k=(n+h/30)%12;const c=l-a*Math.max(Math.min(k-3,9-k,1),-1);return Math.round(255*c).toString(16).padStart(2,'0');};
+  return '#'+f(0)+f(8)+f(4);
+}
+function generatePalette(hex){
+  const[h,s,l]=hexToHsl(hex);
+  return{
+    navy:hex,
+    blue:hex,
+    bl: hslToHex(h,Math.max(s-10,20),Math.min(l+14,65)),
+    rule: hslToHex(h,Math.max(s-40,8),Math.min(l+46,88)),
+    rule2:hslToHex(h,Math.max(s-50,4),Math.min(l+55,94)),
+    bg:   hslToHex(h,Math.max(s-55,2),Math.min(l+58,97)),
+    bgw:  hslToHex(h,Math.max(s-60,1),Math.min(l+60,98.5)),
+    chip: hslToHex(h,Math.max(s-48,4),Math.min(l+52,95)),
+  };
+}
+function applyPalette(p){
+  const r=document.documentElement.style;
+  r.setProperty('--navy',p.navy);r.setProperty('--blue',p.blue);r.setProperty('--bl',p.bl);
+  r.setProperty('--rule',p.rule);r.setProperty('--rule2',p.rule2);
+  r.setProperty('--bg',p.bg);r.setProperty('--bgw',p.bgw);r.setProperty('--chip-bg',p.chip);
+}
+function applyCustomColor(){
+  const hex=document.getElementById('custom-color').value;
+  // clear any theme class
+  ['charcoal','forest','burgundy','slate'].forEach(t=>document.body.classList.remove('theme-'+t));
+  document.querySelectorAll('.theme-card').forEach(c=>c.classList.remove('active'));
+  const p=generatePalette(hex);
+  applyPalette(p);
+  document.getElementById('theme-panel').style.display='none';
+}
+// Preview palette swatches when color changes
+document.addEventListener('DOMContentLoaded',()=>{
+  const inp=document.getElementById('custom-color');
+  if(inp)inp.addEventListener('input',()=>{
+    const p=generatePalette(inp.value);
+    const prev=document.getElementById('palette-preview');
+    if(prev)prev.innerHTML=[p.navy,p.bl,p.rule,p.bg,p.chip]
+      .map(c=>`<div style="flex:1;background:${c};"></div>`).join('');
+  });
+});
+
+/* ───── Add page ───── */
+let slideCount=5;
+function addPage(tpl){
+  if(!tpl)return;
+  slideCount++;
+  const id='s'+slideCount;
+  const wrap=document.createElement('div');
+  wrap.className='page-wrap';
+
+  const templates={
+    blank:`<div class="slide-topbar"></div>
+      <div class="slide-footer"><span><b>Allerise</b></span><span>Confidential</span></div>`,
+    content:`<div class="slide-topbar"></div>
+      <div class="obj" style="left:24mm;top:13mm;width:240mm;height:5mm;">
+        ${HANDLES}<div class="obj-inner ot-kicker">セクション名</div></div>
+      <div class="obj" style="left:24mm;top:17mm;width:240mm;height:9mm;">
+        ${HANDLES}<div class="obj-inner ot-h2">スライドタイトル</div></div>
+      <div class="obj" style="left:24mm;top:28mm;width:249mm;height:1mm;" data-lock="1">
+        <div class="obj-inner ot-rule"></div></div>
+      <div class="obj" style="left:24mm;top:32mm;width:249mm;height:140mm;">
+        ${HANDLES}<div class="obj-inner ot-plain">本文テキスト</div></div>
+      <div class="slide-footer"><span><b>Allerise</b></span><span>Confidential</span></div>`,
+    twocol:`<div class="slide-topbar"></div>
+      <div class="obj" style="left:24mm;top:13mm;width:240mm;height:5mm;">
+        ${HANDLES}<div class="obj-inner ot-kicker">セクション名</div></div>
+      <div class="obj" style="left:24mm;top:17mm;width:240mm;height:9mm;">
+        ${HANDLES}<div class="obj-inner ot-h2">スライドタイトル</div></div>
+      <div class="obj" style="left:24mm;top:28mm;width:249mm;height:1mm;" data-lock="1">
+        <div class="obj-inner ot-rule"></div></div>
+      <div class="obj" style="left:24mm;top:32mm;width:122mm;height:140mm;">
+        ${HANDLES}<div class="obj-inner ot-box-top"><div class="box-h">左カラム</div><ul class="cl"><li>項目1</li><li>項目2</li></ul></div></div>
+      <div class="obj" style="left:152mm;top:32mm;width:121mm;height:140mm;">
+        ${HANDLES}<div class="obj-inner ot-box-top"><div class="box-h">右カラム</div><ul class="cl"><li>項目1</li><li>項目2</li></ul></div></div>
+      <div class="slide-footer"><span><b>Allerise</b></span><span>Confidential</span></div>`,
+    section:`<div class="slide-topbar"></div>
+      <div class="obj" style="left:24mm;top:28mm;width:249mm;height:2mm;" data-lock="1">
+        <div class="obj-inner ot-rule-bold"></div></div>
+      <div class="obj" style="left:24mm;top:80mm;width:249mm;height:12mm;">
+        ${HANDLES}<div class="obj-inner ot-kicker" style="font-size:11px;letter-spacing:.28em;">SECTION ${slideCount-1}</div></div>
+      <div class="obj" style="left:24mm;top:94mm;width:249mm;height:22mm;">
+        ${HANDLES}<div class="obj-inner ot-h1">セクションタイトル</div></div>
+      <div class="obj" style="left:24mm;top:180mm;width:249mm;height:2mm;" data-lock="1">
+        <div class="obj-inner ot-rule"></div></div>
+      <div class="slide-footer"><span><b>Allerise</b></span><span>Confidential</span></div>`,
+  };
+
+  wrap.innerHTML=`<div class="slide" id="${id}">${templates[tpl]||templates.blank}</div>`;
+  document.getElementById('slides-area').appendChild(wrap);
+  // Init objects in new slide
+  wrap.querySelectorAll('.obj').forEach(initObj);
+  // Scroll to new slide
+  wrap.scrollIntoView({behavior:'smooth',block:'start'});
+  applyZoom();
+}
+
+/* ───── Theme ───── */
+const THEMES=['','charcoal','forest','burgundy','slate'];
+let currentTheme='';
+function setTheme(t){
+  THEMES.forEach(th=>document.body.classList.remove('theme-'+th));
+  if(t)document.body.classList.add('theme-'+t);
+  currentTheme=t;
+  document.querySelectorAll('.theme-card').forEach(c=>c.classList.remove('active'));
+  const id='tc-'+(t||'default');
+  const el=document.getElementById(id);
+  if(el)el.classList.add('active');
+  document.getElementById('theme-panel').style.display='none';
+}
+function toggleThemePanel(){
+  const p=document.getElementById('theme-panel');
+  p.style.display=p.style.display==='none'?'block':'none';
+}
+// mark default active on load
+document.getElementById('tc-default').classList.add('active');
+// close panel on outside click
+document.addEventListener('mousedown',e=>{
+  const p=document.getElementById('theme-panel');
+  const b=document.getElementById('theme-btn');
+  if(p.style.display!=='none'&&!p.contains(e.target)&&e.target!==b)
+    p.style.display='none';
+});
+</script>
+</body>
+</html>
