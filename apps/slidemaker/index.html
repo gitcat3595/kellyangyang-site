@@ -2,28 +2,44 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<script src="../vendor/crypto-js.min.js?v=5"></script>
 <script>
+/* ── Google Sign-In auth ── */
 (()=>{
-  const KEY="slidemaker-unlocked";
-  const HASH="33d5ec4cc7e026c9fe5291319b562377c3c9c7e1e3296346b66d3129b8c7ef51";
-  const digest=v=>CryptoJS.SHA256(v).toString();
-  const unlock=()=>{document.documentElement.classList.remove("apps-locked");document.documentElement.classList.add("apps-unlocked");};
-  window.unlockApps=()=>{
-    const cover=document.querySelector("#apps-lock"),input=cover?.querySelector("input"),error=cover?.querySelector("b");
-    if(!input||!error)return false;
-    if(digest(input.value)===HASH){sessionStorage.setItem(KEY,"yes");unlock();cover.remove();}
-    else{error.textContent="パスワードが違います。";input.select();}
-    return false;
-  };
-  if(sessionStorage.getItem(KEY)==="yes"){unlock();return;}
+  const KEY="slidemaker-google-unlocked";
+  const ALLOWED_EMAIL="noriko.yanagisawa@allerise.com";
+  const CLIENT_ID="363213623035-68jcvf3p43nlslejsikqn7non5u5kfkr.apps.googleusercontent.com";
+
+  const unlock=()=>{document.documentElement.classList.remove("apps-locked");document.documentElement.classList.add("apps-unlocked");const c=document.getElementById("apps-lock");if(c)c.remove();};
+
+  if(sessionStorage.getItem(KEY)===ALLOWED_EMAIL){unlock();return;}
+
   document.documentElement.classList.add("apps-locked");
   document.addEventListener("DOMContentLoaded",()=>{
     const cover=document.createElement("div");
     cover.id="apps-lock";
-    cover.innerHTML=`<form onsubmit="return window.unlockApps()"><p class="lock-kicker">ALLERISE</p><h1>Slide Maker</h1><p>パスワードを入力してください。</p><input type="password" autocomplete="current-password" placeholder="Password" aria-label="Password" required><button type="button" onclick="window.unlockApps()">開く</button><b aria-live="polite"></b></form>`;
+    cover.innerHTML=`<div><p class="lock-kicker">ALLERISE</p><h1>Slide Maker</h1><p>Googleアカウントでサインインしてください。</p><div id="g-btn-wrap"></div><b id="g-err" aria-live="polite"></b></div>`;
     document.body.prepend(cover);
-    cover.querySelector("input").focus();
+
+    // Load Google Identity Services
+    const s=document.createElement("script");
+    s.src="https://accounts.google.com/gsi/client";
+    s.onload=()=>{
+      google.accounts.id.initialize({
+        client_id: CLIENT_ID,
+        callback: (resp)=>{
+          // Decode JWT payload
+          const payload=JSON.parse(atob(resp.credential.split(".")[1]));
+          if(payload.email===ALLOWED_EMAIL){
+            sessionStorage.setItem(KEY,ALLOWED_EMAIL);
+            unlock();
+          } else {
+            document.getElementById("g-err").textContent=`${payload.email} はアクセス権限がありません。`;
+          }
+        }
+      });
+      google.accounts.id.renderButton(document.getElementById("g-btn-wrap"),{theme:"filled_blue",size:"large",text:"signin_with",locale:"ja"});
+    };
+    document.head.appendChild(s);
   });
 })();
 </script>
