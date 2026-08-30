@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI & Robot Learning - Advanced 进阶版</title>
+    <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', 'PingFang SC', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+    max-width: 1000px;
+    width: 100%;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 2.2em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.level-selector {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.level-btn {
+    padding: 12px 24px;
+    border: 2px solid #667eea;
+    background: white;
+    color: #667eea;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+}
+
+.level-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.topic-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.topic-btn {
+    padding: 10px 15px;
+    border: 2px solid #764ba2;
+    background: white;
+    color: #764ba2;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    font-size: 0.95em;
+}
+
+.topic-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(118, 75, 162, 0.3);
+}
+
+.topic-btn.active {
+    background: #764ba2;
+    color: white;
+}
+
+.animation-area {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.scene {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.character {
+    position: absolute;
+    font-size: 50px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.robot {
+    left: 15%;
+    animation-delay: 0s;
+}
+
+.ai {
+    right: 15%;
+    animation-delay: 1s;
+}
+
+.tech-icon {
+    font-size: 60px;
+    opacity: 0.3;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.content-box {
+    background: #f5f5f5;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 25px;
+    border-left: 4px solid #667eea;
+}
+
+.chinese-text {
+    font-size: 1.3em;
+    color: #333;
+    margin-bottom: 15px;
+    line-height: 1.7;
+    font-weight: 500;
+    animation: slideIn 0.5s ease;
+}
+
+.english-text {
+    font-size: 1em;
+    color: #667eea;
+    font-weight: bold;
+    margin-bottom: 15px;
+    animation: slideIn 0.5s ease 0.2s backwards;
+}
+
+.english-text span {
+    background: #e0e7ff;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin: 0 4px;
+}
+
+.phrase-box {
+    background: white;
+    border-left: 4px solid #764ba2;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.phrase-title {
+    font-weight: bold;
+    color: #764ba2;
+    font-size: 1.05em;
+    margin-bottom: 5px;
+}
+
+.phrase-chinese {
+    font-size: 0.95em;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.phrase-english {
+    font-size: 0.9em;
+    color: #667eea;
+    margin-bottom: 8px;
+}
+
+.phrase-explain {
+    font-size: 0.85em;
+    color: #666;
+    line-height: 1.5;
+}
+
+.audio-controls {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    align-items: center;
+}
+
+.audio-btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #667eea;
+    color: white;
+    font-size: 0.95em;
+}
+
+.audio-btn:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+}
+
+.audio-btn.stop {
+    background: #e74c3c;
+}
+
+.audio-btn.stop:hover {
+    background: #c0392b;
+}
+
+.audio-status {
+    font-size: 0.9em;
+    color: #667eea;
+    font-weight: bold;
+}
+
+.navigation {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #f0f0f0;
+    color: #333;
+    border: 2px solid #ddd;
+}
+
+.btn-secondary:hover {
+    background: #e8e8e8;
+    transform: translateY(-2px);
+}
+
+.vocabulary {
+    background: #fafafa;
+    border-left: 4px solid #667eea;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.vocabulary h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.15em;
+}
+
+.vocab-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+}
+
+.vocab-item {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-left: 3px solid #667eea;
+}
+
+.vocab-chinese {
+    font-size: 1em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.vocab-english {
+    font-size: 0.92em;
+    color: #667eea;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.vocab-definition {
+    font-size: 0.8em;
+    color: #666;
+    line-height: 1.4;
+}
+
+.example {
+    font-size: 0.8em;
+    color: #764ba2;
+    margin-top: 8px;
+    font-style: italic;
+    padding-top: 8px;
+    border-top: 1px solid #e0e7ff;
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+    }
+
+    .header h1 {
+        font-size: 1.6em;
+    }
+
+    .chinese-text {
+        font-size: 1.05em;
+    }
+
+    .level-btn {
+        font-size: 0.9em;
+        padding: 10px 18px;
+    }
+
+    .topic-btn {
+        font-size: 0.85em;
+        padding: 8px 12px;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 AI & Robot Learning - 进阶版</h1>
+            <p style="color: #666; margin-top: 10px;">Advanced AI & Technology Education</p>
+        </div>
+
+        <div class="level-selector">
+            <button class="level-btn active" data-level="beginner">初级 Beginner</button>
+            <button class="level-btn" data-level="intermediate">中级 Intermediate</button>
+            <button class="level-btn" data-level="advanced">高级 Advanced</button>
+        </div>
+
+        <div class="topic-selector" id="topicSelector"></div>
+
+        <div class="animation-area">
+            <div class="scene" id="scene">
+                <div class="character robot">🤖</div>
+                <div class="character ai">✨</div>
+                <div class="tech-icon" id="techIcon">⚙️</div>
+            </div>
+        </div>
+
+        <div class="audio-controls">
+            <button id="playAudioBtn" class="audio-btn">🔊 播放音频 Play Audio</button>
+            <button id="pauseAudioBtn" class="audio-btn stop" style="display:none;">⏹ 停止 Stop</button>
+            <span class="audio-status" id="audioStatus"></span>
+        </div>
+
+        <div class="content-box">
+            <div class="chinese-text" id="chineseText"></div>
+            <div class="english-text" id="englishText"></div>
+            <div id="phrasesContainer"></div>
+        </div>
+
+        <div class="navigation">
+            <button class="btn btn-secondary" id="prevBtn">← 上一个</button>
+            <button class="btn btn-secondary" id="nextBtn">下一个 →</button>
+        </div>
+
+        <div class="vocabulary" id="vocabulary">
+            <h3>📚 技术词汇 Technical Vocabulary</h3>
+            <div class="vocab-list" id="vocabList"></div>
+        </div>
+    </div>
+
+    <script>
+const contentData = {
+    beginner: [
+        {
+            topic: "AI基础",
+            icon: "🧠",
+            sections: [
+                {
+                    chinese: "人工智能（AI）是指由人类制造的、能够感知环境、学习和做出决策的智能机器或程序。",
+                    english: "<span>Artificial Intelligence (AI)</span> refers to machines or programs created by humans that can perceive the environment, learn, and make decisions.",
+                    phrases: [
+                        {
+                            title: "关键概念 Key Concept",
+                            chinese: "感知环境",
+                            english: "Perceive the environment",
+                            explain: "机器通过传感器或数据接收来理解周围的世界"
+                        }
+                    ],
+                    vocab: ["人工智能", "感知", "学习", "决策"]
+                },
+                {
+                    chinese: "机器学习是AI的一个分支，它让计算机不通过显式编程就能学习数据中的模式。",
+                    english: "<span>Machine Learning (ML)</span> is a branch of AI that enables computers to learn patterns in data without being explicitly programmed.",
+                    phrases: [
+                        {
+                            title: "核心原理 Core Principle",
+                            chinese: "从数据中学习",
+                            english: "Learn from data",
+                            explain: "不需要人类手动编写每一条规则，计算机自己找规律"
+                        }
+                    ],
+                    vocab: ["机器学习", "模式识别", "数据", "算法"]
+                }
+            ]
+        },
+        {
+            topic: "机器学习",
+            icon: "📊",
+            sections: [
+                {
+                    chinese: "监督学习是一种常见的机器学习方法，计算机通过标记好的数据来学习。",
+                    english: "<span>Supervised Learning</span> is a common ML method where the computer learns from labeled data with clear answers.",
+                    phrases: [
+                        {
+                            title: "例子 Example",
+                            chinese: "邮件分类",
+                            english: "Email classification",
+                            explain: "计算机学习识别垃圾邮件和正常邮件，因为每封邮件都被标记了"
+                        }
+                    ],
+                    vocab: ["监督学习", "标记数据", "分类", "训练"]
+                },
+                {
+                    chinese: "无监督学习让计算机自己发现数据中隐藏的结构和模式。",
+                    english: "<span>Unsupervised Learning</span> allows computers to discover hidden structures and patterns in data on their own.",
+                    phrases: [
+                        {
+                            title: "应用 Application",
+                            chinese: "聚类分析",
+                            english: "Clustering",
+                            explain: "机器把相似的东西自动分组在一起，不需要人类告诉它们"
+                        }
+                    ],
+                    vocab: ["无监督学习", "聚类", "模式发现", "无标签数据"]
+                }
+            ]
+        }
+    ],
+    intermediate: [
+        {
+            topic: "神经网络",
+            icon: "🧬",
+            sections: [
+                {
+                    chinese: "人工神经网络受到人类大脑的启发，由许多互相连接的节点组成，这些节点可以处理信息。",
+                    english: "<span>Artificial Neural Networks (ANN)</span> are inspired by the human brain and consist of interconnected nodes that process information.",
+                    phrases: [
+                        {
+                            title: "结构 Structure",
+                            chinese: "神经元和连接",
+                            english: "Neurons and connections",
+                            explain: "每个人工神经元接收输入，进行计算，然后传递输出给下一层"
+                        }
+                    ],
+                    vocab: ["神经网络", "神经元", "权重", "激活函数"]
+                },
+                {
+                    chinese: "深度学习使用多层神经网络来解决复杂的问题，如图像识别和语言处理。",
+                    english: "<span>Deep Learning</span> uses multiple layers of neural networks to solve complex problems like image recognition and language processing.",
+                    phrases: [
+                        {
+                            title: "技术应用 Technical Application",
+                            chinese: "卷积神经网络（CNN）",
+                            english: "Convolutional Neural Networks (CNN)",
+                            explain: "特别擅长处理图像，每层提取不同级别的特征：边线→形状→物体"
+                        }
+                    ],
+                    vocab: ["深度学习", "卷积", "特征提取", "反向传播"]
+                }
+            ]
+        },
+        {
+            topic: "自然语言处理",
+            icon: "💬",
+            sections: [
+                {
+                    chinese: "自然语言处理（NLP）是AI的一个领域，它让计算机理解、解释和生成人类语言。",
+                    english: "<span>Natural Language Processing (NLP)</span> is a field of AI that enables computers to understand, interpret, and generate human language.",
+                    phrases: [
+                        {
+                            title: "核心挑战 Core Challenge",
+                            chinese: "语义理解",
+                            english: "Semantic understanding",
+                            explain: "理解词汇的含义，以及词汇在上下文中的真实意图很困难"
+                        }
+                    ],
+                    vocab: ["自然语言处理", "语义", "语法", "分词"]
+                },
+                {
+                    chinese: "Transformer模型和注意力机制使得AI可以更好地理解文本中词汇之间的关系。",
+                    english: "<span>Transformer models</span> and <span>attention mechanisms</span> enable AI to better understand relationships between words in text.",
+                    phrases: [
+                        {
+                            title: "创新 Innovation",
+                            chinese: "注意力机制",
+                            english: "Attention mechanism",
+                            explain: "模型学会关注文本中最相关的部分，类似人类阅读时的注意力"
+                        }
+                    ],
+                    vocab: ["Transformer", "注意力", "编码器", "解码器"]
+                }
+            ]
+        }
+    ],
+    advanced: [
+        {
+            topic: "计算机视觉",
+            icon: "👁️",
+            sections: [
+                {
+                    chinese: "计算机视觉使机器能够从图像和视频中提取有意义的信息，模仿人类视觉系统。",
+                    english: "<span>Computer Vision</span> enables machines to extract meaningful information from images and videos, mimicking the human visual system.",
+                    phrases: [
+                        {
+                            title: "技术分解 Technical Breakdown",
+                            chinese: "特征金字塔网络",
+                            english: "Feature Pyramid Networks (FPN)",
+                            explain: "在多个尺度上识别物体，使得小物体和大物体都能被准确检测"
+                        }
+                    ],
+                    vocab: ["计算机视觉", "特征提取", "目标检测", "语义分割"]
+                },
+                {
+                    chinese: "对抗攻击是对计算机视觉系统的一种挑战，通过添加看不见的微小噪声来欺骗AI。",
+                    english: "<span>Adversarial attacks</span> are a challenge to computer vision systems - they use tiny imperceptible noise to fool AI models.",
+                    phrases: [
+                        {
+                            title: "安全问题 Security Issue",
+                            chinese: "健壮性测试",
+                            english: "Robustness testing",
+                            explain: "检查AI模型在面对输入变化时是否仍能准确工作，这对自动驾驶等应用很关键"
+                        }
+                    ],
+                    vocab: ["对抗攻击", "鲁棒性", "扰动", "防御机制"]
+                }
+            ]
+        },
+        {
+            topic: "强化学习",
+            icon: "🎮",
+            sections: [
+                {
+                    chinese: "强化学习通过奖励和惩罚机制训练AI，使其学会在特定环境中做出最优决策。",
+                    english: "<span>Reinforcement Learning (RL)</span> trains AI through reward and punishment mechanisms to make optimal decisions in specific environments.",
+                    phrases: [
+                        {
+                            title: "算法逻辑 Algorithm Logic",
+                            chinese: "Q-learning",
+                            english: "Q-learning",
+                            explain: "AI学习每个状态下的最优行动，通过试错和经验积累来改进"
+                        }
+                    ],
+                    vocab: ["强化学习", "奖励", "策略", "价值函数"]
+                },
+                {
+                    chinese: "深度强化学习结合了深度学习和强化学习，创造了能够在复杂环境中学习的AI。",
+                    english: "<span>Deep Reinforcement Learning (DRL)</span> combines deep learning with reinforcement learning to create AI that learns in complex environments.",
+                    phrases: [
+                        {
+                            title: "实际应用 Real Application",
+                            chinese: "AlphaGo",
+                            english: "AlphaGo",
+                            explain: "Google的AI使用深度强化学习学会了下围棋，甚至战胜了世界冠军"
+                        }
+                    ],
+                    vocab: ["深度强化学习", "策略梯度", "演员评论家", "蒙特卡洛"]
+                }
+            ]
+        }
+    ]
+};
+
+let currentLevel = 'beginner';
+let currentTopic = 0;
+let currentSection = 0;
+let isSpeaking = false;
+
+const levelBtns = document.querySelectorAll('.level-btn');
+const topicSelector = document.getElementById('topicSelector');
+const playAudioBtn = document.getElementById('playAudioBtn');
+const pauseAudioBtn = document.getElementById('pauseAudioBtn');
+const audioStatus = document.getElementById('audioStatus');
+const chineseText = document.getElementById('chineseText');
+const englishText = document.getElementById('englishText');
+const phrasesContainer = document.getElementById('phrasesContainer');
+const vocabList = document.getElementById('vocabList');
+const techIcon = document.getElementById('techIcon');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+function initLevel(level) {
+    currentLevel = level;
+    currentTopic = 0;
+    currentSection = 0;
+    isSpeaking = false;
+
+    levelBtns.forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`[data-level="${level}"]`).classList.add('active');
+
+    updateTopicSelector();
+    displayContent();
+}
+
+function updateTopicSelector() {
+    topicSelector.innerHTML = '';
+    const levelData = contentData[currentLevel];
+
+    levelData.forEach((item, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'topic-btn' + (index === 0 ? ' active' : '');
+        btn.textContent = `${item.icon} ${item.topic}`;
+        btn.onclick = () => selectTopic(index);
+        topicSelector.appendChild(btn);
+    });
+}
+
+function selectTopic(index) {
+    currentTopic = index;
+    currentSection = 0;
+    document.querySelectorAll('.topic-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', i === index);
+    });
+    displayContent();
+}
+
+function displayContent() {
+    const levelData = contentData[currentLevel];
+    const topic = levelData[currentTopic];
+    const section = topic.sections[currentSection];
+
+    if (!section) {
+        chineseText.textContent = '课程完成！Lesson Complete!';
+        englishText.textContent = '';
+        phrasesContainer.innerHTML = '';
+        vocabList.innerHTML = '';
+        return;
+    }
+
+    techIcon.textContent = topic.icon;
+    chineseText.textContent = section.chinese;
+    englishText.innerHTML = section.english;
+
+    phrasesContainer.innerHTML = '';
+    section.phrases.forEach(phrase => {
+        const phraseBox = document.createElement('div');
+        phraseBox.className = 'phrase-box';
+        phraseBox.innerHTML = `
+            <div class="phrase-title">${phrase.title}</div>
+            <div class="phrase-chinese">🇨🇳 ${phrase.chinese}</div>
+            <div class="phrase-english">🇬🇧 ${phrase.english}</div>
+            <div class="phrase-explain">📌 ${phrase.explain}</div>
+        `;
+        phrasesContainer.appendChild(phraseBox);
+    });
+
+    updateVocabulary();
+    stopAudio();
+}
+
+function updateVocabulary() {
+    const levelData = contentData[currentLevel];
+    const topic = levelData[currentTopic];
+    const section = topic.sections[currentSection];
+
+    vocabList.innerHTML = '';
+
+    const vocabMap = {
+        '人工智能': 'Artificial Intelligence (AI)',
+        '感知': 'Perceive',
+        '学习': 'Learning',
+        '决策': 'Decision making',
+        '机器学习': 'Machine Learning (ML)',
+        '模式识别': 'Pattern recognition',
+        '数据': 'Data',
+        '算法': 'Algorithm',
+        '监督学习': 'Supervised Learning',
+        '分类': 'Classification',
+        '训练': 'Training',
+        '无监督学习': 'Unsupervised Learning',
+        '聚类': 'Clustering',
+        '模式发现': 'Pattern discovery',
+        '神经网络': 'Neural Networks',
+        '神经元': 'Neuron',
+        '权重': 'Weights',
+        '激活函数': 'Activation function',
+        '深度学习': 'Deep Learning',
+        '特征提取': 'Feature extraction',
+        '反向传播': 'Backpropagation',
+        '自然语言处理': 'Natural Language Processing (NLP)',
+        '语义': 'Semantics',
+        '语法': 'Syntax',
+        '分词': 'Tokenization',
+        '计算机视觉': 'Computer Vision',
+        '目标检测': 'Object detection',
+        '语义分割': 'Semantic segmentation',
+        '强化学习': 'Reinforcement Learning (RL)',
+        '奖励': 'Reward',
+        '策略': 'Policy',
+        '价值函数': 'Value function'
+    };
+
+    section.vocab.forEach(word => {
+        const vocabItem = document.createElement('div');
+        vocabItem.className = 'vocab-item';
+        vocabItem.innerHTML = `
+            <div class="vocab-chinese">🇨🇳 ${word}</div>
+            <div class="vocab-english">🇬🇧 ${vocabMap[word] || word}</div>
+            <div class="vocab-definition">= A key technical term in AI and machine learning</div>
+        `;
+        vocabList.appendChild(vocabItem);
+    });
+}
+
+function speakChineseText() {
+    if (isSpeaking) {
+        stopAudio();
+        return;
+    }
+
+    const text = chineseText.textContent;
+    if (!text) return;
+
+    isSpeaking = true;
+    playAudioBtn.style.display = 'none';
+    pauseAudioBtn.style.display = 'inline-block';
+    audioStatus.textContent = '🔊 播放中... Playing...';
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'zh-CN';
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+
+    utterance.onend = () => {
+        stopAudio();
+    };
+
+    utterance.onerror = () => {
+        audioStatus.textContent = '音频播放出错 Audio error';
+        stopAudio();
+    };
+
+    speechSynthesis.speak(utterance);
+}
+
+function stopAudio() {
+    if (speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+    }
+    isSpeaking = false;
+    playAudioBtn.style.display = 'inline-block';
+    pauseAudioBtn.style.display = 'none';
+    audioStatus.textContent = '';
+}
+
+function nextSection() {
+    const levelData = contentData[currentLevel];
+    const topic = levelData[currentTopic];
+
+    if (currentSection < topic.sections.length - 1) {
+        currentSection++;
+        displayContent();
+    } else if (currentTopic < levelData.length - 1) {
+        currentTopic++;
+        currentSection = 0;
+        updateTopicSelector();
+        displayContent();
+    }
+}
+
+function prevSection() {
+    if (currentSection > 0) {
+        currentSection--;
+        displayContent();
+    } else if (currentTopic > 0) {
+        currentTopic--;
+        document.querySelectorAll('.topic-btn').forEach((btn, i) => {
+            btn.classList.toggle('active', i === currentTopic);
+        });
+        const levelData = contentData[currentLevel];
+        currentSection = levelData[currentTopic].sections.length - 1;
+        displayContent();
+    }
+}
+
+levelBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        initLevel(e.target.dataset.level);
+    });
+});
+
+playAudioBtn.addEventListener('click', speakChineseText);
+pauseAudioBtn.addEventListener('click', stopAudio);
+nextBtn.addEventListener('click', nextSection);
+prevBtn.addEventListener('click', prevSection);
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') nextSection();
+    if (e.key === 'ArrowLeft') prevSection();
+});
+
+initLevel('beginner');
+    </script>
+</body>
+</html>
