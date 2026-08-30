@@ -279,6 +279,8 @@ body {
 
 .vocab-item.playing {
     background: #e0e7ff;
+    border-left: 3px solid #667eea;
+    box-shadow: inset 0 0 10px rgba(102, 126, 234, 0.2);
 }
 
 .vocab-chinese {
@@ -429,7 +431,10 @@ body {
         </div>
 
         <div class="vocabulary" id="vocabulary">
-            <h3>📚 技术词汇 Technical Vocabulary (点击播放 Click to Play)</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0;">📚 技术词汇 Technical Vocabulary (点击播放 Click to Play)</h3>
+                <span id="vocabProgress" style="font-size: 0.9em; color: #666;"></span>
+            </div>
             <div class="vocab-list" id="vocabList"></div>
         </div>
     </div>
@@ -587,6 +592,9 @@ const vocabList = document.getElementById('vocabList');
 const visualEmoji = document.getElementById('visualEmoji');
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
+const vocabProgress = document.getElementById('vocabProgress');
+
+let totalVocabItems = 0;
 
 function initLevel(level) {
     currentLevel = level;
@@ -745,6 +753,8 @@ function displayContent() {
 
 function updateVocabulary(vocabItems) {
     vocabList.innerHTML = '';
+    totalVocabItems = vocabItems.length;
+    vocabProgress.textContent = `词汇数 / Vocabulary: ${totalVocabItems} items`;
 
     vocabItems.forEach((vocab, index) => {
         const vocabItem = document.createElement('div');
