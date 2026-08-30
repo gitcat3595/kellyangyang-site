@@ -435,62 +435,86 @@ const contentData = {
             icon: "🧠",
             sections: [
                 {
-                    chinese: "人工智能（AI）是指由人类制造的、能够感知环境、学习和做出决策的智能机器或程序。",
-                    english: "<span>Artificial Intelligence (AI)</span> refers to machines or programs created by humans that can perceive the environment, learn, and make decisions.",
+                    chinese: "人工智能（AI）是计算机科学的一个分支，通过模拟人类智能过程来创建能够执行复杂任务的系统。根据图灵提出的「图灵测试」，如果机器的反应无法与人类区别，则可以认为该机器具有智能。AI包括感知（通过传感器或数据接收）、学习（识别数据中的模式）和推理（做出决策）三个核心过程。",
+                    english: "<span>Artificial Intelligence (AI)</span> is a branch of computer science that creates systems simulating human intelligence processes. Following Turing's test, if a machine's responses are indistinguishable from humans, it can be considered intelligent. AI comprises three core processes: <span>perception</span> (sensing), <span>learning</span> (pattern recognition), and <span>reasoning</span> (decision-making).",
                     phrases: [
                         {
-                            title: "关键概念 Key Concept",
-                            chinese: "感知环境",
-                            english: "Perceive the environment",
-                            explain: "机器通过传感器或数据接收来理解周围的世界"
+                            title: "图灵测试 Turing Test",
+                            chinese: "评估机器智能的标准",
+                            english: "Standard for assessing machine intelligence",
+                            explain: "由艾伦·图灵于1950年提出。如果审问者无法区分他正在与人还是机器交谈，则该机器通过测试。这是评估AI是否达到人类智能水平的重要基准。"
+                        },
+                        {
+                            title: "感知系统 Perception System",
+                            chinese: "数据获取与预处理",
+                            english: "Data acquisition and preprocessing",
+                            explain: "AI必须通过摄像头、麦克风或其他传感器获取原始数据，然后进行清洗、标准化和特征提取，使数据适合后续处理。"
                         }
                     ],
-                    vocab: ["人工智能", "感知", "学习", "决策"]
+                    vocab: ["人工智能", "图灵测试", "感知", "学习", "推理", "数据"]
                 },
                 {
-                    chinese: "机器学习是AI的一个分支，它让计算机不通过显式编程就能学习数据中的模式。",
-                    english: "<span>Machine Learning (ML)</span> is a branch of AI that enables computers to learn patterns in data without being explicitly programmed.",
+                    chinese: "机器学习（ML）是AI的核心子领域，其基本原理是：构建数学模型使计算机从数据中自动学习规律，而非由人类编程者显式编写所有决策规则。传统编程范式是「数据+规则→结果」，而机器学习的范式是「数据+结果→规则」。通过大量训练样本，算法学习函数f(x)使得给定输入x时能预测输出y。",
+                    english: "<span>Machine Learning (ML)</span> is the core subfield of AI based on: building mathematical models for computers to automatically learn patterns from data, rather than explicit programming of all rules. Traditional programming: data + rules → results; ML paradigm: data + results → rules. Algorithms learn function f(x) from training samples to predict output y given input x.",
                     phrases: [
                         {
-                            title: "核心原理 Core Principle",
-                            chinese: "从数据中学习",
-                            english: "Learn from data",
-                            explain: "不需要人类手动编写每一条规则，计算机自己找规律"
+                            title: "函数近似 Function Approximation",
+                            chinese: "学习目标的数学本质",
+                            english: "Mathematical essence of learning goals",
+                            explain: "ML算法的目的是找到最佳函数f(x)来近似真实数据分布。这可以表示为最小化损失函数L(f(x), y)，即预测值与实际值的误差。"
+                        },
+                        {
+                            title: "泛化能力 Generalization",
+                            chinese: "从训练数据推广到未知数据",
+                            english: "Extending from training data to unknown data",
+                            explain: "模型应能处理从未见过的数据。过度拟合（overfitting）发生在模型记住训练数据而非学习通用规则时，导致在新数据上表现差。需要通过正则化、交叉验证等技术防止过度拟合。"
                         }
                     ],
-                    vocab: ["机器学习", "模式识别", "数据", "算法"]
+                    vocab: ["机器学习", "函数近似", "损失函数", "泛化", "过度拟合", "交叉验证"]
                 }
             ]
         },
         {
-            topic: "机器学习",
+            topic: "监督学习",
             icon: "📊",
             sections: [
                 {
-                    chinese: "监督学习是一种常见的机器学习方法，计算机通过标记好的数据来学习。",
-                    english: "<span>Supervised Learning</span> is a common ML method where the computer learns from labeled data with clear answers.",
+                    chinese: "监督学习在有标签数据上训练模型，即每个输入样本x都有对应的正确输出标签y。学习过程是最小化预测值ŷ与真实标签y之间的损失函数L(ŷ, y)。常见的损失函数包括：分类任务用交叉熵损失H(p,q) = -Σ p(i)log(q(i))，回归任务用均方误差MSE = (1/n)Σ(ŷᵢ-yᵢ)²。",
+                    english: "<span>Supervised Learning</span> trains models on labeled data where each input x has corresponding correct output label y. The learning process minimizes loss function L(ŷ, y) between predictions and true labels. Common loss functions: classification uses cross-entropy H(p,q) = -Σ p(i)log(q(i)); regression uses MSE = (1/n)Σ(ŷᵢ-yᵢ)².",
                     phrases: [
                         {
-                            title: "例子 Example",
-                            chinese: "邮件分类",
-                            english: "Email classification",
-                            explain: "计算机学习识别垃圾邮件和正常邮件，因为每封邮件都被标记了"
+                            title: "交叉熵损失 Cross-Entropy Loss",
+                            chinese: "分类任务的标准损失函数",
+                            english: "Standard loss function for classification",
+                            explain: "衡量预测概率分布与真实分布的差异。公式：-Σ yᵢ·log(ŷᵢ)。当预测概率接近真实标签时，损失接近0；否则损失值很大。在多分类问题中，使用softmax激活函数结合交叉熵损失。"
+                        },
+                        {
+                            title: "反向传播 Backpropagation",
+                            chinese: "高效计算梯度的算法",
+                            english: "Algorithm for efficient gradient computation",
+                            explain: "通过链式法则从输出层向输入层传递误差信号，计算每个参数的梯度∂L/∂w。这使得数百万参数的模型训练成为可能。梯度被用于参数更新：wₙₑw = wₒₗd - η·∂L/∂w，其中η是学习率。"
                         }
                     ],
-                    vocab: ["监督学习", "标记数据", "分类", "训练"]
+                    vocab: ["监督学习", "交叉熵", "均方误差", "反向传播", "梯度下降", "学习率"]
                 },
                 {
-                    chinese: "无监督学习让计算机自己发现数据中隐藏的结构和模式。",
-                    english: "<span>Unsupervised Learning</span> allows computers to discover hidden structures and patterns in data on their own.",
+                    chinese: "无监督学习在无标签数据上发现隐藏结构。主要方法包括聚类（grouping similar data points）和降维（reducing data dimensions）。K-means聚类的目标是最小化类内方差：J = ΣΣ||x - μₖ||²。降维（如PCA）通过线性变换将高维数据映射到低维空间，保留最大方差的方向。",
+                    english: "<span>Unsupervised Learning</span> discovers hidden structures in unlabeled data. Main methods: clustering (grouping similar points) and dimensionality reduction. K-means minimizes within-cluster variance: J = ΣΣ||x - μₖ||². Dimensionality reduction (like PCA) projects high-dimensional data to low dimensions preserving maximum variance directions.",
                     phrases: [
                         {
-                            title: "应用 Application",
-                            chinese: "聚类分析",
-                            english: "Clustering",
-                            explain: "机器把相似的东西自动分组在一起，不需要人类告诉它们"
+                            title: "K-means聚类算法 K-means Algorithm",
+                            chinese: "迭代优化聚类中心",
+                            english: "Iteratively optimizing cluster centers",
+                            explain: "算法流程：(1)随机初始化K个聚类中心μ；(2)分配阶段-将每个点分配到最近的中心；(3)更新阶段-重新计算中心为其内所有点的平均值；(4)重复直到收敛。时间复杂度O(nKD·iterations)，其中n是样本数，K是簇数，D是维度。"
+                        },
+                        {
+                            title: "主成分分析 PCA",
+                            chinese: "线性降维方法",
+                            english: "Linear dimensionality reduction",
+                            explain: "目标是找到使数据方差最大的方向。通过对协方差矩阵Σ进行特征值分解，保留方差最大的k个特征向量作为新坐标轴。可将d维数据降至k维(k<d)，同时保留大部分信息。"
                         }
                     ],
-                    vocab: ["无监督学习", "聚类", "模式发现", "无标签数据"]
+                    vocab: ["无监督学习", "K-means", "聚类", "PCA", "降维", "协方差"]
                 }
             ]
         }
@@ -501,30 +525,42 @@ const contentData = {
             icon: "🧬",
             sections: [
                 {
-                    chinese: "人工神经网络受到人类大脑的启发，由许多互相连接的节点组成，这些节点可以处理信息。",
-                    english: "<span>Artificial Neural Networks (ANN)</span> are inspired by the human brain and consist of interconnected nodes that process information.",
+                    chinese: "前馈神经网络（Feedforward Neural Network）由输入层、隐藏层和输出层组成。每个神经元计算：a = σ(wᵀx + b)，其中w是权重向量，b是偏置，σ是激活函数。通用近似定理证明，仅需一个足够宽的隐藏层就能近似任意连续函数。网络深度增加表现力，但增加了训练难度（梯度消失/爆炸问题）。",
+                    english: "<span>Feedforward Neural Networks (FNN)</span> consist of input, hidden, and output layers. Each neuron computes: a = σ(wᵀx + b), where w are weights, b is bias, σ is activation. The universal approximation theorem proves a single sufficiently wide hidden layer can approximate any continuous function. Depth increases expressiveness but training difficulty (vanishing/exploding gradients).",
                     phrases: [
                         {
-                            title: "结构 Structure",
-                            chinese: "神经元和连接",
-                            english: "Neurons and connections",
-                            explain: "每个人工神经元接收输入，进行计算，然后传递输出给下一层"
+                            title: "激活函数 Activation Functions",
+                            chinese: "引入非线性",
+                            english: "Introducing nonlinearity",
+                            explain: "常用激活函数：(1) ReLU: f(x)=max(0,x) - 计算效率高，缓解梯度消失；(2) Sigmoid: σ(x)=1/(1+e^-x) - 输出范围(0,1)，适合概率；(3) Tanh: 输出范围(-1,1)。没有激活函数的多层网络等价于单层线性变换。"
+                        },
+                        {
+                            title: "权重初始化 Weight Initialization",
+                            chinese: "影响训练收敛速度",
+                            english: "Affects training convergence speed",
+                            explain: "初始化策略：(1) Xavier初始化：方差~1/n_in，保持信号方差一致；(2) He初始化：方差~2/n_in，适合ReLU。不当初始化导致梯度消失/爆炸，极大降低训练效率。"
                         }
                     ],
-                    vocab: ["神经网络", "神经元", "权重", "激活函数"]
+                    vocab: ["前馈网络", "激活函数", "ReLU", "Sigmoid", "权重", "偏置"]
                 },
                 {
-                    chinese: "深度学习使用多层神经网络来解决复杂的问题，如图像识别和语言处理。",
-                    english: "<span>Deep Learning</span> uses multiple layers of neural networks to solve complex problems like image recognition and language processing.",
+                    chinese: "卷积神经网络（CNN）通过卷积、池化等操作自动提取空间特征。卷积操作定义为：y[i,j] = Σ Σ w[a,b]·x[i+a,j+b]，使用共享权重减少参数数量。CNN的优势：(1)局部连接性-每个神经元仅连接局部邻域；(2)权重共享-同一特征检测器在各位置重复使用；(3)空间不变性-能识别平移的对象。ResNet通过跳跃连接y=F(x)+x解决深层网络的梯度消失问题。",
+                    english: "<span>Convolutional Neural Networks (CNN)</span> automatically extract spatial features via convolution and pooling: y[i,j] = Σ Σ w[a,b]·x[i+a,j+b]. Advantages: (1) local connectivity - each neuron connects to local neighborhood; (2) weight sharing - same detector reused across positions; (3) translation invariance. ResNet uses skip connections y=F(x)+x to solve vanishing gradients in deep networks.",
                     phrases: [
                         {
-                            title: "技术应用 Technical Application",
-                            chinese: "卷积神经网络（CNN）",
-                            english: "Convolutional Neural Networks (CNN)",
-                            explain: "特别擅长处理图像，每层提取不同级别的特征：边线→形状→物体"
+                            title: "卷积运算 Convolution Operation",
+                            chinese: "特征提取的数学基础",
+                            english: "Mathematical foundation of feature extraction",
+                            explain: "卷积核（kernel/filter）是一个可学习的小矩阵，通过滑动对输入进行元素乘积求和。第一层卷积检测边线和纹理（低级特征），深层卷积检测轮廓和部件（高级特征）。通过多个卷积核学习不同特征。"
+                        },
+                        {
+                            title: "池化操作 Pooling",
+                            chinese: "降采样与特征选择",
+                            english: "Downsampling and feature selection",
+                            explain: "最大池化max(x)和平均池化avg(x)都能减少特征映射大小，降低计算复杂度。通过保留最显著的特征实现降维。也具有平移不变性：图像轻微平移时，池化后的结果基本不变。"
                         }
                     ],
-                    vocab: ["深度学习", "卷积", "特征提取", "反向传播"]
+                    vocab: ["卷积神经网络", "卷积核", "池化", "特征映射", "ResNet", "跳跃连接"]
                 }
             ]
         },
@@ -533,30 +569,42 @@ const contentData = {
             icon: "💬",
             sections: [
                 {
-                    chinese: "自然语言处理（NLP）是AI的一个领域，它让计算机理解、解释和生成人类语言。",
-                    english: "<span>Natural Language Processing (NLP)</span> is a field of AI that enables computers to understand, interpret, and generate human language.",
+                    chinese: "自然语言处理面临的根本挑战是语言的歧义性和上下文依赖性。词向量表示（Word Embeddings）解决了这个问题，将词映射到d维向量空间：word2vec通过skip-gram模型最大化上下文预测概率P(context|word)。GloVe（Global Vectors）结合全局矩阵分解和局部上下文窗口，目标是wᵢᵀwⱼ ≈ log(X_ij)，其中X_ij是词i和j的共现频率。",
+                    english: "<span>Natural Language Processing</span> faces fundamental challenges: language ambiguity and context dependency. <span>Word Embeddings</span> solve this by mapping words to d-dimensional vectors. Word2vec maximizes P(context|word) via skip-gram. GloVe (Global Vectors) combines matrix factorization and local context, targeting wᵢᵀwⱼ ≈ log(X_ij) where X_ij is co-occurrence frequency.",
                     phrases: [
                         {
-                            title: "核心挑战 Core Challenge",
-                            chinese: "语义理解",
-                            english: "Semantic understanding",
-                            explain: "理解词汇的含义，以及词汇在上下文中的真实意图很困难"
+                            title: "Skip-gram模型 Skip-gram Model",
+                            chinese: "从中心词预测上下文",
+                            english: "Predicting context from center word",
+                            explain: "给定中心词w_t，预测窗口内的上下文词：P(w_t+j|w_t) = exp(v'_wt+j · v_wt)/Σ exp(v'_k · v_wt)。通过随机梯度下降最优化，向量自动学习语义相似性：king-man+woman≈queen体现了向量算术的意义。"
+                        },
+                        {
+                            title: "分布假说 Distributional Hypothesis",
+                            chinese: "\"词的含义是其使用环境\"",
+                            english: "\"A word's meaning is its context of use\"",
+                            explain: "在相似上下文中出现的词具有相似含义。这是词向量方法的理论基础。从大规模文本语料库学习的词向量捕捉了词的潜在语义。"
                         }
                     ],
-                    vocab: ["自然语言处理", "语义", "语法", "分词"]
+                    vocab: ["词向量", "Word2Vec", "Skip-gram", "GloVe", "分布假说", "嵌入"]
                 },
                 {
-                    chinese: "Transformer模型和注意力机制使得AI可以更好地理解文本中词汇之间的关系。",
-                    english: "<span>Transformer models</span> and <span>attention mechanisms</span> enable AI to better understand relationships between words in text.",
+                    chinese: "Transformer架构由Vaswani等人在2017年提出，核心是自注意力机制（Self-Attention）。对于序列中的每个位置，计算Query(Q)、Key(K)、Value(V)的三元组：Attention(Q,K,V) = softmax(QKᵀ/√d_k)V。这使模型能同时处理序列的所有位置，避免了RNN的顺序依赖。BERT和GPT等大规模语言模型基于Transformer，通过预训练学习通用语言表示。",
+                    english: "<span>Transformer</span> architecture (Vaswani et al., 2017) is built on <span>Self-Attention</span>. For each position, compute Query-Key-Value triplets: Attention(Q,K,V) = softmax(QKᵀ/√d_k)V. This processes entire sequence positions simultaneously, avoiding RNN sequential dependency. BERT and GPT are large language models based on Transformers, learning universal language representations via pretraining.",
                     phrases: [
                         {
-                            title: "创新 Innovation",
-                            chinese: "注意力机制",
-                            english: "Attention mechanism",
-                            explain: "模型学会关注文本中最相关的部分，类似人类阅读时的注意力"
+                            title: "自注意力机制 Self-Attention",
+                            chinese: "计算序列内的依赖关系",
+                            english: "Computing dependencies within sequence",
+                            explain: "Q=WQ·x, K=WK·x, V=WV·x是通过可学习矩阵的线性变换。注意力权重αᵢⱼ=softmax_j(Qᵢ·Kⱼ/√d_k)表示位置i对位置j的关注程度。多头注意力（Multi-Head）使用h个注意力头并联，增强模型表达能力。"
+                        },
+                        {
+                            title: "位置编码 Positional Encoding",
+                            chinese: "保留序列顺序信息",
+                            english: "Preserving sequence order information",
+                            explain: "Transformer本身是置换不变的。通过加入PE(pos,2i)=sin(pos/10000^2i/d)和PE(pos,2i+1)=cos(pos/10000^2i/d)保存位置信息。不同位置的编码具有独特的特征，且相对位置差异被捕捉。"
                         }
                     ],
-                    vocab: ["Transformer", "注意力", "编码器", "解码器"]
+                    vocab: ["Transformer", "自注意力", "Query", "Key", "Value", "BERT", "GPT"]
                 }
             ]
         }
@@ -567,30 +615,42 @@ const contentData = {
             icon: "👁️",
             sections: [
                 {
-                    chinese: "计算机视觉使机器能够从图像和视频中提取有意义的信息，模仿人类视觉系统。",
-                    english: "<span>Computer Vision</span> enables machines to extract meaningful information from images and videos, mimicking the human visual system.",
+                    chinese: "物体检测任务要求不仅分类图像内容，还要精确定位所有物体的边界框。YOLO（You Only Look Once）将检测转化为回归问题：直接预测bounding box坐标(x,y,w,h)和类别概率。Faster R-CNN使用区域建议网络（RPN）生成候选框，再用ROI池化提取固定大小特征。损失函数综合分类损失Lcls和定位损失Lloc：L=Lcls+λLloc。非极大值抑制（NMS）后处理去除重叠框：对IoU>阈值的框保留分数最高的。",
+                    english: "<span>Object Detection</span> requires both classification and precise bounding box localization. <span>YOLO</span> treats detection as regression: directly predicts box coordinates (x,y,w,h) and class probabilities. <span>Faster R-CNN</span> uses Region Proposal Network (RPN) for candidate boxes, then ROI pooling for fixed-size features. Loss function: L=Lcls+λLloc. Non-maximum suppression (NMS) removes overlapping boxes, keeping highest-scoring for IoU>threshold.",
                     phrases: [
                         {
-                            title: "技术分解 Technical Breakdown",
-                            chinese: "特征金字塔网络",
-                            english: "Feature Pyramid Networks (FPN)",
-                            explain: "在多个尺度上识别物体，使得小物体和大物体都能被准确检测"
+                            title: "交并比 IoU (Intersection over Union)",
+                            chinese: "衡量预测框的准确性",
+                            english: "Measuring predicted box accuracy",
+                            explain: "IoU = |A∩B|/|A∪B|，A和B分别是预测框和真实框。IoU≥0.5常作为检测正确的阈值。mAP（Mean Average Precision）是检测模型的标准评估指标，计算所有类别在不同IoU阈值下的精确率-召回率曲线下面积。"
+                        },
+                        {
+                            title: "特征金字塔网络 FPN",
+                            chinese: "多尺度特征融合",
+                            english: "Multi-scale feature fusion",
+                            explain: "通过自顶向下的路径和横向连接，从多个分辨率层融合特征。高层特征有高语义信息但分辨率低，低层特征分辨率高但语义信息少。FPN在每个等级上进行检测，有效检测从大到小的多尺度物体。"
                         }
                     ],
-                    vocab: ["计算机视觉", "特征提取", "目标检测", "语义分割"]
+                    vocab: ["物体检测", "YOLO", "Faster R-CNN", "IoU", "NMS", "FPN"]
                 },
                 {
-                    chinese: "对抗攻击是对计算机视觉系统的一种挑战，通过添加看不见的微小噪声来欺骗AI。",
-                    english: "<span>Adversarial attacks</span> are a challenge to computer vision systems - they use tiny imperceptible noise to fool AI models.",
+                    chinese: "语义分割（Semantic Segmentation）为图像中每个像素分配类标签。全卷积网络（FCN）用反卷积（transposed convolution）恢复空间分辨率：y=w*x，其中*表示反卷积。U-Net采用编码器-解码器架构，通过跳跃连接融合多层特征。实例分割（Instance Segmentation）进一步区分同类不同实例。对抗攻击利用梯度信息生成对抗样本：x'=x+ε·sign(∇_xL(θ,x,y))，其中ε是攻击强度，极小的扰动能欺骗高精度模型。",
+                    english: "<span>Semantic Segmentation</span> assigns class labels to every pixel. <span>Fully Convolutional Networks (FCN)</span> use transposed convolution for spatial recovery: y=w*x. <span>U-Net</span> uses encoder-decoder with skip connections for multi-scale fusion. <span>Adversarial attacks</span> generate adversarial samples: x'=x+ε·sign(∇_xL(θ,x,y)). Tiny perturbations fool high-accuracy models, raising security concerns.",
                     phrases: [
                         {
-                            title: "安全问题 Security Issue",
-                            chinese: "健壮性测试",
-                            english: "Robustness testing",
-                            explain: "检查AI模型在面对输入变化时是否仍能准确工作，这对自动驾驶等应用很关键"
+                            title: "反卷积运算 Transposed Convolution",
+                            chinese: "上采样特征图",
+                            english: "Upsampling feature maps",
+                            explain: "反卷积是卷积的逆操作，通过在输入元素间插入零并进行标准卷积实现上采样。虽然计算上与反向卷积不同，但在反向传播中起相反作用。通过学习权重自动学习合适的上采样方式。"
+                        },
+                        {
+                            title: "对抗鲁棒性 Adversarial Robustness",
+                            chinese: "抵抗对抗攻击的能力",
+                            english: "Resistance to adversarial attacks",
+                            explain: "FGSM、PGD等攻击方法揭示了模型脆弱性。防御方法包括：(1)对抗训练-使用对抗样本扩增训练集；(2)输入变换-图像预处理；(3)认证防御-数学保证鲁棒性。对抗鲁棒性与标准精度存在权衡。"
                         }
                     ],
-                    vocab: ["对抗攻击", "鲁棒性", "扰动", "防御机制"]
+                    vocab: ["语义分割", "FCN", "U-Net", "反卷积", "实例分割", "对抗鲁棒性"]
                 }
             ]
         },
@@ -599,30 +659,42 @@ const contentData = {
             icon: "🎮",
             sections: [
                 {
-                    chinese: "强化学习通过奖励和惩罚机制训练AI，使其学会在特定环境中做出最优决策。",
-                    english: "<span>Reinforcement Learning (RL)</span> trains AI through reward and punishment mechanisms to make optimal decisions in specific environments.",
+                    chinese: "强化学习（Reinforcement Learning）通过与环境的交互学习最优策略π。基本框架是马尔可夫决策过程（MDP）：状态s∈S，行动a∈A，奖励r，转移概率P(s'|s,a)。目标是最大化累积奖励G_t=Σ_i γⁱr_t+i，其中γ是折扣因子。Q-learning学习行动-值函数Q(s,a)≈最优状态-行动价值：Q(s,a)←Q(s,a)+α[r+γmax_a'Q(s',a')-Q(s,a)]。",
+                    english: "<span>Reinforcement Learning</span> learns optimal policy π by interacting with environment. Framework is Markov Decision Process (MDP): states s∈S, actions a∈A, rewards r, transition P(s'|s,a). Goal: maximize cumulative reward G_t=Σ_i γⁱr_t+i where γ is discount factor. <span>Q-learning</span> learns action-value function: Q(s,a)←Q(s,a)+α[r+γmax_a'Q(s',a')-Q(s,a)].",
                     phrases: [
                         {
-                            title: "算法逻辑 Algorithm Logic",
-                            chinese: "Q-learning",
-                            english: "Q-learning",
-                            explain: "AI学习每个状态下的最优行动，通过试错和经验积累来改进"
+                            title: "贝尔曼方程 Bellman Equation",
+                            chinese: "价值函数的递推关系",
+                            english: "Recursive relationship of value functions",
+                            explain: "V(s) = E[r_t + γV(s')]，当前状态价值等于即时奖励加折扣后续状态价值的期望。Q(s,a)=E[r_t+γmax_a'Q(s',a')]。这个递推结构是强化学习算法的数学基础，使得价值迭代和策略迭代成为可能。"
+                        },
+                        {
+                            title: "探索-利用权衡 Exploration-Exploitation",
+                            chinese: "平衡学习与利用知识",
+                            english: "Balancing learning and knowledge use",
+                            explain: "ε-贪心策略：以概率ε随机选择动作（探索），以1-ε选择已知最优动作（利用）。UCB方法用置信上界鼓励探索：a*=argmax_a[Q(a)+c√(ln(t)/N(a))]。Thompson抽样从贝叶斯后验分布采样。解决探索不足导致的局部最优。"
                         }
                     ],
-                    vocab: ["强化学习", "奖励", "策略", "价值函数"]
+                    vocab: ["强化学习", "MDP", "Q-learning", "贝尔曼", "折扣因子", "探索"]
                 },
                 {
-                    chinese: "深度强化学习结合了深度学习和强化学习，创造了能够在复杂环境中学习的AI。",
-                    english: "<span>Deep Reinforcement Learning (DRL)</span> combines deep learning with reinforcement learning to create AI that learns in complex environments.",
+                    chinese: "深度强化学习（Deep RL）用神经网络表示策略或价值函数，解决高维状态空间问题。DQN（Deep Q-Network）用卷积神经网络估计Q值，创新包括：(1)经验回放-存储转移并批量采样，减弱样本相关性；(2)目标网络-用独立网络θ'计算目标Q_target=r+γmax_a'Q(s',a';θ')，减少不稳定性。策略梯度方法直接优化策略：∇J(θ)=E[∇logπ(a|s;θ)·Q(s,a)]。Actor-Critic结合了两者，演员（Actor）学策略，评论家（Critic）学价值。AlphaGo=蒙特卡洛树搜索+价值网络+策略网络，战胜李世石标志性时刻。",
+                    english: "<span>Deep RL</span> uses neural networks for policy/value representation, handling high-dimensional state spaces. <span>DQN</span> innovations: (1) experience replay - batch sampling from stored transitions reducing correlation; (2) target network - separate θ' for Q_target=r+γmax_a'Q(s',a';θ') reducing instability. <span>Policy Gradient</span> directly optimizes policy: ∇J(θ)=E[∇logπ(a|s;θ)·Q(s,a)]. <span>Actor-Critic</span> combines both: Actor learns policy, Critic learns value. AlphaGo = MCTS + value network + policy network.",
                     phrases: [
                         {
-                            title: "实际应用 Real Application",
-                            chinese: "AlphaGo",
-                            english: "AlphaGo",
-                            explain: "Google的AI使用深度强化学习学会了下围棋，甚至战胜了世界冠军"
+                            title: "经验回放 Experience Replay",
+                            chinese: "打破样本时序相关性",
+                            english: "Breaking temporal sample correlation",
+                            explain: "将(s,a,r,s')元组存入缓冲区D，每次迭代从中均匀随机采样小批次。大大减弱连续样本间的相关性，使梯度估计方差减小。批量中样本独立同分布，更接近监督学习假设，加速收敛。缓冲区大小和采样批次是重要超参数。"
+                        },
+                        {
+                            title: "目标网络 Target Network",
+                            chinese: "稳定训练的关键机制",
+                            english: "Key mechanism for training stability",
+                            explain: "用两个网络：Q(s,a;θ)用于预测，Q_target(s',a';θ')计算目标。θ'每K步从θ复制一次。避免目标和预测使用同一参数导致的发散。TD错误δ=r+γmax_a'Q(s',a';θ')-Q(s,a;θ)更加稳定。"
                         }
                     ],
-                    vocab: ["深度强化学习", "策略梯度", "演员评论家", "蒙特卡洛"]
+                    vocab: ["深度强化学习", "DQN", "经验回放", "策略梯度", "Actor-Critic", "AlphaGo"]
                 }
             ]
         }
@@ -724,47 +796,70 @@ function updateVocabulary() {
     vocabList.innerHTML = '';
 
     const vocabMap = {
-        '人工智能': 'Artificial Intelligence (AI)',
-        '感知': 'Perceive',
-        '学习': 'Learning',
-        '决策': 'Decision making',
-        '机器学习': 'Machine Learning (ML)',
-        '模式识别': 'Pattern recognition',
-        '数据': 'Data',
-        '算法': 'Algorithm',
-        '监督学习': 'Supervised Learning',
-        '分类': 'Classification',
-        '训练': 'Training',
-        '无监督学习': 'Unsupervised Learning',
-        '聚类': 'Clustering',
-        '模式发现': 'Pattern discovery',
-        '神经网络': 'Neural Networks',
-        '神经元': 'Neuron',
-        '权重': 'Weights',
-        '激活函数': 'Activation function',
-        '深度学习': 'Deep Learning',
-        '特征提取': 'Feature extraction',
-        '反向传播': 'Backpropagation',
-        '自然语言处理': 'Natural Language Processing (NLP)',
-        '语义': 'Semantics',
-        '语法': 'Syntax',
-        '分词': 'Tokenization',
-        '计算机视觉': 'Computer Vision',
-        '目标检测': 'Object detection',
-        '语义分割': 'Semantic segmentation',
-        '强化学习': 'Reinforcement Learning (RL)',
-        '奖励': 'Reward',
-        '策略': 'Policy',
-        '价值函数': 'Value function'
+        '人工智能': {en: 'Artificial Intelligence (AI)', def: '能够执行需要人类智能的任务的计算机系统'},
+        '感知': {en: 'Perception', def: '通过传感器获取和理解环境信息的能力'},
+        '学习': {en: 'Learning', def: '从数据中提取规律和知识的过程'},
+        '决策': {en: 'Decision Making', def: '根据信息和规则选择最优行动的过程'},
+        '机器学习': {en: 'Machine Learning', def: '不依赖显式编程而通过数据自动改进的计算机学习方法'},
+        '模式识别': {en: 'Pattern Recognition', def: '在复杂数据中发现规律性的能力'},
+        '数据': {en: 'Data', def: '用于训练和测试机器学习模型的信息'},
+        '算法': {en: 'Algorithm', def: '解决问题的有限步骤序列'},
+        '监督学习': {en: 'Supervised Learning', def: '使用有标签的训练数据学习输入到输出的映射'},
+        '分类': {en: 'Classification', def: '将输入分配到预定义类别的任务'},
+        '训练': {en: 'Training', def: '通过数据调整模型参数使其最小化损失函数的过程'},
+        '无监督学习': {en: 'Unsupervised Learning', def: '在无标签数据中发现隐藏结构'},
+        '聚类': {en: 'Clustering', def: '将相似数据点分组为簇的过程'},
+        '模式发现': {en: 'Pattern Discovery', def: '在数据中自动寻找规律和关联'},
+        '神经网络': {en: 'Neural Networks', def: '受生物神经元启发的计算单元互联网络'},
+        '神经元': {en: 'Neuron', def: '执行加权求和和非线性变换的计算单元'},
+        '权重': {en: 'Weights', def: '连接强度参数，通过训练学习'},
+        '激活函数': {en: 'Activation Function', def: '引入非线性的函数，如ReLU、Sigmoid、Tanh'},
+        '深度学习': {en: 'Deep Learning', def: '使用多层神经网络的机器学习子领域'},
+        '特征提取': {en: 'Feature Extraction', def: '从原始数据中提取有用特征的过程'},
+        '反向传播': {en: 'Backpropagation', def: '计算梯度用于神经网络训练的算法'},
+        '自然语言处理': {en: 'Natural Language Processing', def: '使计算机理解和生成人类语言的技术'},
+        '语义': {en: 'Semantics', def: '词汇和句子的含义'},
+        '语法': {en: 'Syntax', def: '语言的结构和组织规则'},
+        '分词': {en: 'Tokenization', def: '将文本分解为词或子词单位的过程'},
+        '计算机视觉': {en: 'Computer Vision', def: '使计算机从图像和视频提取信息的领域'},
+        '目标检测': {en: 'Object Detection', def: '在图像中定位和分类物体的任务'},
+        '语义分割': {en: 'Semantic Segmentation', def: '为图像每个像素分配类标签的任务'},
+        '强化学习': {en: 'Reinforcement Learning', def: '通过奖励信号学习最优策略的学习范式'},
+        '奖励': {en: 'Reward', def: '衡量代理行为好坏的数值信号'},
+        '策略': {en: 'Policy', def: '从状态到行动的映射或行动选择规则'},
+        '价值函数': {en: 'Value Function', def: '估计状态或状态-行动对的长期价值'},
+        '前馈网络': {en: 'Feedforward Neural Network', def: '信息单向流动的网络结构'},
+        '交叉熵': {en: 'Cross-Entropy', def: '衡量概率分布相似度的损失函数'},
+        '均方误差': {en: 'Mean Squared Error (MSE)', def: '回归任务的常用损失函数'},
+        '梯度下降': {en: 'Gradient Descent', def: '沿损失函数负梯度方向更新参数的优化方法'},
+        '学习率': {en: 'Learning Rate', def: '控制参数更新步长的超参数'},
+        '过度拟合': {en: 'Overfitting', def: '模型过度学习训练数据导致在新数据上泛化能力差'},
+        '交叉验证': {en: 'Cross-Validation', def: '通过多个数据划分评估模型泛化性能的技术'},
+        '卷积神经网络': {en: 'Convolutional Neural Networks (CNN)', def: '用卷积层自动提取图像特征的网络'},
+        '卷积核': {en: 'Convolution Kernel/Filter', def: '可学习的小矩阵用于特征提取'},
+        '池化': {en: 'Pooling', def: '降低特征映射分辨率的操作'},
+        '词向量': {en: 'Word Embeddings', def: '将词表示为d维向量的方法'},
+        '注意力': {en: 'Attention', def: '使模型关注最相关输入部分的机制'},
+        'Transformer': {en: 'Transformer', def: '基于自注意力的深度学习架构'},
+        '物体检测': {en: 'Object Detection', def: '定位和分类图像中所有物体的任务'},
+        'YOLO': {en: 'You Only Look Once', def: '实时物体检测的单阶段检测器'},
+        'IoU': {en: 'Intersection over Union', def: '衡量预测框与真实框重叠度的指标'},
+        '强化学习': {en: 'Reinforcement Learning (RL)', def: '通过环境交互优化策略的学习方法'},
+        'MDP': {en: 'Markov Decision Process', def: '强化学习的数学框架'},
+        'Q-learning': {en: 'Q-learning', def: '学习行动-值函数的无模型强化学习算法'},
+        'DQN': {en: 'Deep Q-Network', def: '用神经网络表示Q函数的深度强化学习方法'},
+        '经验回放': {en: 'Experience Replay', def: '存储并随机采样过去经历以训练的技术'},
+        'AlphaGo': {en: 'AlphaGo', def: 'Google的AI系统，结合深度学习和树搜索赢得围棋'}
     };
 
     section.vocab.forEach(word => {
+        const vocab = vocabMap[word] || {en: word, def: '技术术语'};
         const vocabItem = document.createElement('div');
         vocabItem.className = 'vocab-item';
         vocabItem.innerHTML = `
             <div class="vocab-chinese">🇨🇳 ${word}</div>
-            <div class="vocab-english">🇬🇧 ${vocabMap[word] || word}</div>
-            <div class="vocab-definition">= A key technical term in AI and machine learning</div>
+            <div class="vocab-english">🇬🇧 ${vocab.en}</div>
+            <div class="vocab-definition">📌 ${vocab.def}</div>
         `;
         vocabList.appendChild(vocabItem);
     });
