@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI & Robot Learning - 小学生英文版</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI & Robot Adventure</h1>
+            <p class="subtitle">小学生学英文</p>
+        </div>
+
+        <div class="lesson-selector">
+            <button class="lesson-btn active" data-lesson="1">Day 1: AI入门</button>
+            <button class="lesson-btn" data-lesson="2">Day 2: 龙探索</button>
+            <button class="lesson-btn" data-lesson="3">Day 3: 工厂</button>
+            <button class="lesson-btn" data-lesson="4">Day 4: 实战</button>
+            <button class="lesson-btn" data-lesson="5">Day 5: 阿里</button>
+            <button class="lesson-btn" data-lesson="6">Day 6: 完成</button>
+        </div>
+
+        <div class="animation-area">
+            <div class="scene" id="scene">
+                <!-- 动画内容会动态生成 -->
+                <div class="character robot" id="robot">🤖</div>
+                <div class="character ai" id="ai">✨</div>
+            </div>
+        </div>
+
+        <div class="narration-box">
+            <div class="chinese-text" id="chineseText"></div>
+            <div class="english-highlight" id="englishHighlight"></div>
+        </div>
+
+        <div class="controls">
+            <button id="playBtn" class="btn btn-primary">▶ 播放</button>
+            <button id="pauseBtn" class="btn btn-secondary">⏸ 暂停</button>
+            <button id="nextBtn" class="btn btn-secondary">→ 下一个</button>
+        </div>
+
+        <div class="vocabulary" id="vocabulary">
+            <h3>📖 今日词汇 Today's Words</h3>
+            <div class="vocab-list" id="vocabList"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
