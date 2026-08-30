@@ -4,13 +4,334 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI & Robot Learning - 小学生英文版</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', 'PingFang SC', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+    max-width: 900px;
+    width: 100%;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.header h1 {
+    font-size: 2.5em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 1.2em;
+    color: #666;
+    font-weight: normal;
+}
+
+.audio-status {
+    margin-top: 15px;
+    font-size: 0.95em;
+    color: #667eea;
+    font-weight: bold;
+    height: 24px;
+}
+
+.lesson-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.lesson-btn {
+    padding: 10px 15px;
+    border: 2px solid #667eea;
+    background: white;
+    color: #667eea;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.lesson-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.lesson-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.animation-area {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    border-radius: 15px;
+    padding: 40px;
+    margin-bottom: 30px;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.scene {
+    position: relative;
+    width: 100%;
+    height: 250px;
+}
+
+.character {
+    position: absolute;
+    font-size: 60px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.robot {
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.ai {
+    right: 20%;
+    animation-delay: 1s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-30px);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.narration-box {
+    background: #f5f5f5;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.chinese-text {
+    font-size: 1.4em;
+    color: #333;
+    margin-bottom: 15px;
+    line-height: 1.6;
+    font-weight: 500;
+    animation: slideIn 0.5s ease;
+}
+
+.english-highlight {
+    font-size: 1.1em;
+    color: #667eea;
+    font-weight: bold;
+    animation: slideIn 0.5s ease 0.3s backwards;
+}
+
+.english-highlight span {
+    background: #e0e7ff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin: 0 3px;
+}
+
+.controls {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary.active {
+    background: #e74c3c;
+}
+
+.btn-primary.active:hover {
+    background: #c0392b;
+}
+
+.btn-secondary {
+    background: #f0f0f0;
+    color: #333;
+    border: 2px solid #ddd;
+}
+
+.btn-secondary:hover {
+    background: #e8e8e8;
+    transform: translateY(-2px);
+}
+
+.vocabulary {
+    background: #fafafa;
+    border-left: 4px solid #667eea;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.vocabulary h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.vocab-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.vocab-item {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-left: 3px solid #667eea;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.vocab-item:hover {
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    transform: translateY(-2px);
+}
+
+.vocab-item.playing {
+    background: #e0e7ff;
+}
+
+.vocab-chinese {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.vocab-english {
+    font-size: 0.95em;
+    color: #667eea;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.vocab-definition {
+    font-size: 0.85em;
+    color: #666;
+    margin-top: 5px;
+    line-height: 1.4;
+}
+
+.vocab-audio-btn {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 8px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.75em;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.vocab-audio-btn:hover {
+    background: #5568d3;
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+    }
+
+    .header h1 {
+        font-size: 1.8em;
+    }
+
+    .chinese-text {
+        font-size: 1.1em;
+    }
+
+    .character {
+        font-size: 40px;
+    }
+
+    .lesson-btn {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+
+    .btn {
+        padding: 10px 18px;
+        font-size: 0.9em;
+    }
+}
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🤖 AI & Robot Adventure</h1>
-            <p class="subtitle">小学生学英文</p>
+            <p class="subtitle">小学生学英文 (含完整音频)</p>
+            <div class="audio-status" id="audioStatus"></div>
         </div>
 
         <div class="lesson-selector">
@@ -24,7 +345,6 @@
 
         <div class="animation-area">
             <div class="scene" id="scene">
-                <!-- 动画内容会动态生成 -->
                 <div class="character robot" id="robot">🤖</div>
                 <div class="character ai" id="ai">✨</div>
             </div>
@@ -36,17 +356,459 @@
         </div>
 
         <div class="controls">
-            <button id="playBtn" class="btn btn-primary">▶ 播放</button>
-            <button id="pauseBtn" class="btn btn-secondary">⏸ 暂停</button>
-            <button id="nextBtn" class="btn btn-secondary">→ 下一个</button>
+            <button id="playSceneBtn" class="btn btn-primary">🔊 播放场景音频</button>
+            <button id="stopBtn" class="btn btn-primary" style="display:none; background: #e74c3c;">⏹ 停止</button>
+            <button id="prevBtn" class="btn btn-secondary">← 上一个</button>
+            <button id="nextBtn" class="btn btn-secondary">下一个 →</button>
         </div>
 
         <div class="vocabulary" id="vocabulary">
-            <h3>📖 今日词汇 Today's Words</h3>
+            <h3>📖 今日词汇 Today's Words (点击播放音频)</h3>
             <div class="vocab-list" id="vocabList"></div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+const lessons = {
+    1: {
+        title: "Day 1: AI入门 - 初识AI",
+        scenes: [
+            {
+                chinese: "你好！欢迎来到AI和机器人的世界。",
+                english: "Hello! Welcome to the world of <span>AI</span> and <span>Robot</span>!",
+                vocab: [
+                    { cn: "AI", en: "Artificial Intelligence", def: "Machine's ability to think and learn", example: "你好！欢迎来到AI和机器人的世界。" },
+                    { cn: "Robot", en: "Robot", def: "Automated intelligent machine", example: "你好！欢迎来到AI和机器人的世界。" }
+                ]
+            },
+            {
+                chinese: "你知道什么是AI吗？AI就是人工智能。",
+                english: "Do you know what <span>AI</span> is? <span>AI</span> means <span>Artificial Intelligence</span>.",
+                vocab: [
+                    { cn: "人工智能", en: "Artificial Intelligence", def: "Human-like intelligence created by machines", example: "AI就是人工智能。" },
+                    { cn: "Know", en: "Know", def: "To understand or have information about", example: "你知道什么是AI吗？" }
+                ]
+            },
+            {
+                chinese: "机器人是可以自动完成任务的智能机器。",
+                english: "A <span>Robot</span> is an intelligent machine that can <span>automatically</span> complete tasks.",
+                vocab: [
+                    { cn: "机器人", en: "Robot", def: "Machine that performs automatic tasks", example: "机器人是可以自动完成任务的智能机器。" },
+                    { cn: "自动", en: "Automatically", def: "Without human control or direction", example: "机器人是可以自动完成任务的智能机器。" },
+                    { cn: "智能", en: "Intelligent", def: "Able to think and learn", example: "机器人是可以自动完成任务的智能机器。" }
+                ]
+            },
+            {
+                chinese: "现在，AI和机器人帮助我们学习、工作和生活。",
+                english: "Now, <span>AI</span> and <span>Robots</span> help us learn, work, and live.",
+                vocab: [
+                    { cn: "帮助", en: "Help", def: "To give assistance or support", example: "现在，AI和机器人帮助我们学习、工作和生活。" },
+                    { cn: "学习", en: "Learn", def: "To gain knowledge or skills", example: "AI和机器人帮助我们学习。" },
+                    { cn: "工作", en: "Work", def: "To perform tasks or labor", example: "AI和机器人帮助我们工作。" }
+                ]
+            }
+        ]
+    },
+    2: {
+        title: "Day 2: 探秘杭州六小龙 - 学校探索",
+        scenes: [
+            {
+                chinese: "我们来探秘杭州六小龙校园的机器人实验室。",
+                english: "Let's <span>explore</span> the <span>Robot Lab</span> at Hangzhou Liulong Primary School.",
+                vocab: [
+                    { cn: "探秘", en: "Explore", def: "To travel and discover something new", example: "我们来探秘杭州六小龙校园的机器人实验室。" },
+                    { cn: "实验室", en: "Laboratory", def: "A place for scientific research and experiments", example: "机器人实验室。" }
+                ]
+            },
+            {
+                chinese: "这里有各种各样的机器人，可以做很多事情。",
+                english: "There are <span>all kinds</span> of <span>Robots</span> that can do many things.",
+                vocab: [
+                    { cn: "各种各样", en: "All kinds of", def: "Many different types or varieties", example: "这里有各种各样的机器人。" },
+                    { cn: "事情", en: "Things", def: "Objects, tasks, or matters", example: "可以做很多事情。" }
+                ]
+            },
+            {
+                chinese: "科学家和工程师在这里研究和设计新的机器人。",
+                english: "<span>Scientists</span> and <span>Engineers</span> research and <span>design</span> new <span>Robots</span> here.",
+                vocab: [
+                    { cn: "科学家", en: "Scientist", def: "Person who studies science", example: "科学家和工程师在这里。" },
+                    { cn: "工程师", en: "Engineer", def: "Person who designs and builds things", example: "工程师在这里。" },
+                    { cn: "研究", en: "Research", def: "Careful investigation or study", example: "科学家和工程师在这里研究。" },
+                    { cn: "设计", en: "Design", def: "To plan or create", example: "工程师设计新的机器人。" }
+                ]
+            }
+        ]
+    },
+    3: {
+        title: "Day 3: 数学科技新港湾 - 工厂参观",
+        scenes: [
+            {
+                chinese: "现在我们进入智能工厂，看看机器人是如何工作的。",
+                english: "Now we enter a <span>Smart Factory</span> to see how <span>Robots</span> work.",
+                vocab: [
+                    { cn: "智能工厂", en: "Smart Factory", def: "Factory with AI and robots", example: "现在我们进入智能工厂。" },
+                    { cn: "工作", en: "Work", def: "To perform tasks or function", example: "看看机器人是如何工作的。" }
+                ]
+            },
+            {
+                chinese: "机器人和人工智能一起工作，生产产品。",
+                english: "<span>Robots</span> and <span>AI</span> work together to <span>produce</span> products.",
+                vocab: [
+                    { cn: "一起", en: "Together", def: "With another or others", example: "机器人和人工智能一起工作。" },
+                    { cn: "生产", en: "Produce", def: "To make or manufacture", example: "生产产品。" },
+                    { cn: "产品", en: "Product", def: "Something made or manufactured", example: "生产产品。" }
+                ]
+            },
+            {
+                chinese: "他们可以24小时不停地工作。",
+                english: "They can work 24 hours without stopping.",
+                vocab: [
+                    { cn: "小时", en: "Hours", def: "Units of time, 60 minutes each", example: "他们可以24小时工作。" },
+                    { cn: "不停", en: "Without stopping", def: "Continuously without rest", example: "可以24小时不停地工作。" }
+                ]
+            }
+        ]
+    },
+    4: {
+        title: "Day 4: AI实战 & 机器人大课堂",
+        scenes: [
+            {
+                chinese: "今天我们学习AI的实际应用。",
+                english: "Today we learn about <span>AI Applications</span> in real life.",
+                vocab: [
+                    { cn: "应用", en: "Application", def: "Practical use of something", example: "AI的实际应用。" },
+                    { cn: "学习", en: "Learn", def: "To gain knowledge or skills", example: "我们学习AI的实际应用。" }
+                ]
+            },
+            {
+                chinese: "图像识别帮助机器人看到和理解世界。",
+                english: "<span>Image Recognition</span> helps <span>Robots</span> see and understand the world.",
+                vocab: [
+                    { cn: "图像识别", en: "Image Recognition", def: "AI's ability to identify images", example: "图像识别帮助机器人。" },
+                    { cn: "识别", en: "Recognize", def: "To identify or acknowledge", example: "图像识别。" },
+                    { cn: "理解", en: "Understand", def: "To comprehend or make sense of", example: "理解世界。" }
+                ]
+            },
+            {
+                chinese: "语言处理让机器人可以和人类交流。",
+                english: "<span>Language Processing</span> allows <span>Robots</span> to talk with humans.",
+                vocab: [
+                    { cn: "语言处理", en: "Language Processing", def: "AI processing human language", example: "语言处理让机器人交流。" },
+                    { cn: "交流", en: "Communicate", def: "To exchange information or ideas", example: "机器人可以和人类交流。" },
+                    { cn: "人类", en: "Humans", def: "Human beings or people", example: "和人类交流。" }
+                ]
+            }
+        ]
+    },
+    5: {
+        title: "Day 5: 走进阿里巴巴 - 大企业探索",
+        scenes: [
+            {
+                chinese: "阿里巴巴是一个使用AI和大数据的大公司。",
+                english: "<span>Alibaba</span> is a big company that uses <span>AI</span> and <span>Big Data</span>.",
+                vocab: [
+                    { cn: "阿里巴巴", en: "Alibaba", def: "Major Chinese tech company", example: "阿里巴巴是一个大公司。" },
+                    { cn: "公司", en: "Company", def: "Business organization", example: "阿里巴巴是一个公司。" },
+                    { cn: "大数据", en: "Big Data", def: "Very large amounts of data", example: "使用AI和大数据。" }
+                ]
+            },
+            {
+                chinese: "他们的机器人和AI系统帮助数百万人购物。",
+                english: "Their <span>Robots</span> and <span>AI Systems</span> help millions of people shop.",
+                vocab: [
+                    { cn: "系统", en: "System", def: "Set of connected things", example: "AI系统。" },
+                    { cn: "购物", en: "Shop", def: "Buying things", example: "帮助人们购物。" },
+                    { cn: "百万", en: "Million", def: "The number 1,000,000", example: "数百万人。" }
+                ]
+            },
+            {
+                chinese: "这就是AI改变世界的方式。",
+                english: "This is how <span>AI</span> changes the world!",
+                vocab: [
+                    { cn: "改变", en: "Change", def: "To make something different", example: "AI改变世界。" },
+                    { cn: "世界", en: "World", def: "The planet Earth and all people on it", example: "改变世界。" }
+                ]
+            }
+        ]
+    },
+    6: {
+        title: "Day 6: 温泉运程 - 完成仪式",
+        scenes: [
+            {
+                chinese: "六天的学习结束了。我们学会了很多关于AI和机器人的知识。",
+                english: "Six days of learning are over. We learned a lot about <span>AI</span> and <span>Robots</span>!",
+                vocab: [
+                    { cn: "学会", en: "Learn", def: "To gain knowledge or skills", example: "我们学会了很多。" },
+                    { cn: "知识", en: "Knowledge", def: "Information and understanding", example: "关于AI的知识。" }
+                ]
+            },
+            {
+                chinese: "希望这个知识会帮助你们理解未来的世界。",
+                english: "Hope this knowledge helps you understand the future <span>World</span>!",
+                vocab: [
+                    { cn: "希望", en: "Hope", def: "Wish or desire for something", example: "希望这个知识会帮助你们。" },
+                    { cn: "未来", en: "Future", def: "Time to come", example: "未来的世界。" }
+                ]
+            },
+            {
+                chinese: "你们将来可能会成为AI科学家或工程师。",
+                english: "You might become an <span>AI Scientist</span> or <span>Engineer</span> in the future!",
+                vocab: [
+                    { cn: "将来", en: "Future", def: "Time ahead in the future", example: "你们将来可能会成为。" },
+                    { cn: "成为", en: "Become", def: "To come to be", example: "成为AI科学家。" }
+                ]
+            },
+            {
+                chinese: "继续探索，学习永远不会停止。再见！",
+                english: "Keep exploring! Learning never stops. Goodbye and see you soon!",
+                vocab: [
+                    { cn: "继续", en: "Continue", def: "To keep going", example: "继续探索。" },
+                    { cn: "探索", en: "Explore", def: "To travel and discover", example: "继续探索。" },
+                    { cn: "再见", en: "Goodbye", def: "Farewell or saying goodbye", example: "再见！" }
+                ]
+            }
+        ]
+    }
+};
+
+let currentLesson = 1;
+let currentScene = 0;
+let isPlaying = false;
+let audioQueue = [];
+let currentAudioIndex = 0;
+
+const playSceneBtn = document.getElementById('playSceneBtn');
+const stopBtn = document.getElementById('stopBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const chineseText = document.getElementById('chineseText');
+const englishHighlight = document.getElementById('englishHighlight');
+const vocabList = document.getElementById('vocabList');
+const lessonBtns = document.querySelectorAll('.lesson-btn');
+const audioStatus = document.getElementById('audioStatus');
+
+function initLesson(lessonNum) {
+    currentLesson = lessonNum;
+    currentScene = 0;
+    stopAudio();
+
+    lessonBtns.forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`[data-lesson="${lessonNum}"]`).classList.add('active');
+
+    displayScene();
+}
+
+function displayScene() {
+    const lesson = lessons[currentLesson];
+    if (!lesson) return;
+
+    const scene = lesson.scenes[currentScene];
+    if (!scene) {
+        chineseText.textContent = "课程完成！";
+        englishHighlight.textContent = "Lesson Complete!";
+        vocabList.innerHTML = '';
+        return;
+    }
+
+    chineseText.textContent = scene.chinese;
+    englishHighlight.innerHTML = scene.english;
+
+    displayVocabulary(scene.vocab);
+    animateCharacters();
+}
+
+function displayVocabulary(vocabItems) {
+    vocabList.innerHTML = '';
+
+    vocabItems.forEach((vocab, index) => {
+        const vocabItem = document.createElement('div');
+        vocabItem.className = 'vocab-item';
+        vocabItem.id = `vocab-${index}`;
+        vocabItem.innerHTML = `
+            <div class="vocab-chinese">🇨🇳 ${vocab.cn}</div>
+            <div class="vocab-english">🇬🇧 ${vocab.en}</div>
+            <div class="vocab-definition">= ${vocab.def}</div>
+            <button class="vocab-audio-btn" onclick="playVocabAudio(${currentLesson}, ${currentScene}, ${index})">🔊 播放</button>
+        `;
+        vocabList.appendChild(vocabItem);
+    });
+}
+
+function animateCharacters() {
+    const robot = document.getElementById('robot');
+    const ai = document.getElementById('ai');
+
+    robot.style.animation = 'none';
+    ai.style.animation = 'none';
+
+    setTimeout(() => {
+        robot.style.animation = 'float 3s ease-in-out infinite';
+        ai.style.animation = 'float 3s ease-in-out infinite 1s';
+    }, 10);
+}
+
+function playSceneAudio() {
+    if (isPlaying) {
+        stopAudio();
+        return;
+    }
+
+    const lesson = lessons[currentLesson];
+    const scene = lesson.scenes[currentScene];
+    if (!scene) return;
+
+    isPlaying = true;
+    playSceneBtn.style.display = 'none';
+    stopBtn.style.display = 'inline-block';
+    audioStatus.textContent = '🔊 播放中...';
+
+    const speeches = [
+        { text: scene.chinese, lang: 'zh-CN', rate: 0.9 },
+        { text: scene.english.replace(/<[^>]*>/g, ''), lang: 'en-US', rate: 1 }
+    ];
+
+    playNextSpeech(speeches, 0);
+}
+
+function playNextSpeech(speeches, index) {
+    if (!isPlaying || index >= speeches.length) {
+        stopAudio();
+        return;
+    }
+
+    const speech = speeches[index];
+    const utterance = new SpeechSynthesisUtterance(speech.text);
+    utterance.lang = speech.lang;
+    utterance.rate = speech.rate;
+    utterance.pitch = 1;
+
+    utterance.onend = () => {
+        playNextSpeech(speeches, index + 1);
+    };
+
+    utterance.onerror = () => {
+        audioStatus.textContent = '❌ 音频播放出错';
+        stopAudio();
+    };
+
+    speechSynthesis.speak(utterance);
+}
+
+function playVocabAudio(lessonNum, sceneNum, vocabIndex) {
+    const vocab = lessons[lessonNum].scenes[sceneNum].vocab[vocabIndex];
+    const vocabElement = document.getElementById(`vocab-${vocabIndex}`);
+
+    if (isPlaying) {
+        stopAudio();
+        vocabElement.classList.remove('playing');
+        return;
+    }
+
+    isPlaying = true;
+    vocabElement.classList.add('playing');
+    playSceneBtn.style.display = 'none';
+    stopBtn.style.display = 'inline-block';
+    audioStatus.textContent = `🔊 播放 ${vocab.cn}...`;
+
+    const speeches = [
+        { text: vocab.cn, lang: 'zh-CN', rate: 0.8 },
+        { text: vocab.cn, lang: 'zh-CN', rate: 0.8 },
+        { text: `${vocab.en}. Meaning: ${vocab.def}`, lang: 'en-US', rate: 0.95 },
+        { text: vocab.example, lang: 'zh-CN', rate: 0.9 }
+    ];
+
+    playVocabSpeech(speeches, 0, vocabElement);
+}
+
+function playVocabSpeech(speeches, index, vocabElement) {
+    if (!isPlaying || index >= speeches.length) {
+        stopAudio();
+        vocabElement.classList.remove('playing');
+        return;
+    }
+
+    const speech = speeches[index];
+    const utterance = new SpeechSynthesisUtterance(speech.text);
+    utterance.lang = speech.lang;
+    utterance.rate = speech.rate;
+
+    utterance.onend = () => {
+        playVocabSpeech(speeches, index + 1, vocabElement);
+    };
+
+    utterance.onerror = () => {
+        stopAudio();
+        vocabElement.classList.remove('playing');
+    };
+
+    speechSynthesis.speak(utterance);
+}
+
+function stopAudio() {
+    if (speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+    }
+    isPlaying = false;
+    playSceneBtn.style.display = 'inline-block';
+    stopBtn.style.display = 'none';
+    audioStatus.textContent = '';
+
+    document.querySelectorAll('.vocab-item').forEach(item => {
+        item.classList.remove('playing');
+    });
+}
+
+function nextScene() {
+    stopAudio();
+    const lesson = lessons[currentLesson];
+    if (currentScene < lesson.scenes.length - 1) {
+        currentScene++;
+        displayScene();
+        playSceneAudio();
+    } else if (currentLesson < 6) {
+        currentLesson++;
+        currentScene = 0;
+        lessonBtns.forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`[data-lesson="${currentLesson}"]`).classList.add('active');
+        displayScene();
+        playSceneAudio();
+    }
+}
+
+function prevScene() {
+    stopAudio();
+    if (currentScene > 0) {
+        currentScene--;
+        displayScene();
+    } else if (currentLesson > 1) {
+        currentLesson--;
+        const lesson = lessons[currentLesson];
+        currentScene = lesson.scenes.length - 1;
+        lessonBtns.forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`[data-lesson="${currentLesson}"]`).classList.add('active');
+        displayScene();
+    }
+}
+
+playSceneBtn.addEventListener('click', playSceneAudio);
+stopBtn.addEventListener('click', stopAudio);
+nextBtn.addEventListener('click', nextScene);
+prevBtn.addEventListener('click', prevScene);
+
+lessonBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        const lessonNum = parseInt(e.target.dataset.lesson);
+        initLesson(lessonNum);
+    });
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') nextScene();
+    if (e.key === 'ArrowLeft') prevScene();
+});
+
+initLesson(1);
+    </script>
 </body>
 </html>
