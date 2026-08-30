@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI & Robot Learning - Advanced 进阶版</title>
+    <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', 'PingFang SC', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+    max-width: 1100px;
+    width: 100%;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 2.2em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.audio-status {
+    margin-top: 15px;
+    font-size: 0.95em;
+    color: #667eea;
+    font-weight: bold;
+    height: 24px;
+}
+
+.level-selector {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.level-btn {
+    padding: 12px 24px;
+    border: 2px solid #667eea;
+    background: white;
+    color: #667eea;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+}
+
+.level-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.topic-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.topic-btn {
+    padding: 10px 15px;
+    border: 2px solid #764ba2;
+    background: white;
+    color: #764ba2;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    font-size: 0.95em;
+}
+
+.topic-btn.active {
+    background: #764ba2;
+    color: white;
+}
+
+.content-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+    align-items: center;
+}
+
+.visual-area {
+    background: linear-gradient(135deg, #e0e7ff 0%, #f0f0ff 100%);
+    border-radius: 15px;
+    padding: 30px;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.visual-svg {
+    width: 100%;
+    height: 100%;
+    max-height: 350px;
+}
+
+.content-box {
+    background: #f5f5f5;
+    border-radius: 10px;
+    padding: 25px;
+    border-left: 4px solid #667eea;
+}
+
+.chinese-text {
+    font-size: 1.2em;
+    color: #333;
+    margin-bottom: 15px;
+    line-height: 1.7;
+    font-weight: 500;
+}
+
+.english-text {
+    font-size: 0.95em;
+    color: #667eea;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.english-text span {
+    background: #e0e7ff;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin: 0 4px;
+}
+
+.audio-controls {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.audio-btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #667eea;
+    color: white;
+    font-size: 0.9em;
+}
+
+.audio-btn:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+}
+
+.audio-btn.stop {
+    background: #e74c3c;
+}
+
+.phrase-box {
+    background: white;
+    border-left: 4px solid #764ba2;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.phrase-title {
+    font-weight: bold;
+    color: #764ba2;
+    font-size: 0.95em;
+    margin-bottom: 5px;
+}
+
+.phrase-text {
+    font-size: 0.85em;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.vocabulary {
+    background: #fafafa;
+    border-left: 4px solid #667eea;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.vocabulary h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.15em;
+}
+
+.vocab-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+}
+
+.vocab-item {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-left: 3px solid #667eea;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.vocab-item:hover {
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    transform: translateY(-2px);
+}
+
+.vocab-item.playing {
+    background: #e0e7ff;
+}
+
+.vocab-chinese {
+    font-size: 0.95em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.vocab-english {
+    font-size: 0.9em;
+    color: #667eea;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.vocab-definition {
+    font-size: 0.8em;
+    color: #666;
+    line-height: 1.4;
+}
+
+.vocab-audio-btn {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 8px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.75em;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.vocab-audio-btn:hover {
+    background: #5568d3;
+}
+
+.navigation {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 25px;
+    font-size: 0.95em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary {
+    background: #f0f0f0;
+    color: #333;
+    border: 2px solid #ddd;
+}
+
+.btn-secondary:hover {
+    background: #e8e8e8;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 900px) {
+    .content-section {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        padding: 20px;
+    }
+
+    .header h1 {
+        font-size: 1.8em;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 AI & Robot Learning - 进阶版 (含完整音频+图像)</h1>
+            <div class="audio-status" id="audioStatus"></div>
+        </div>
+
+        <div class="level-selector">
+            <button class="level-btn active" data-level="beginner">初级</button>
+            <button class="level-btn" data-level="intermediate">中级</button>
+            <button class="level-btn" data-level="advanced">高级</button>
+        </div>
+
+        <div class="topic-selector" id="topicSelector"></div>
+
+        <div class="content-section">
+            <div class="visual-area" id="visualArea">
+                <svg class="visual-svg" viewBox="0 0 300 300" id="visualSvg"></svg>
+            </div>
+
+            <div class="content-box">
+                <div class="chinese-text" id="chineseText"></div>
+                <div class="english-text" id="englishText"></div>
+                <div class="audio-controls">
+                    <button id="playAudioBtn" class="audio-btn">🔊 播放内容音频</button>
+                    <button id="stopAudioBtn" class="audio-btn stop" style="display:none;">⏹ 停止</button>
+                </div>
+                <div id="phrasesContainer"></div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <button class="btn btn-secondary" id="prevBtn">← 上一个</button>
+            <button class="btn btn-secondary" id="nextBtn">下一个 →</button>
+        </div>
+
+        <div class="vocabulary" id="vocabulary">
+            <h3>📚 技术词汇 (点击播放音频)</h3>
+            <div class="vocab-list" id="vocabList"></div>
+        </div>
+    </div>
+
+    <script>
+// 原有的contentDataをそのまま使用（省略）
+const contentData = {
+    beginner: [
+        {
+            topic: "AI基础",
+            icon: "🧠",
+            visual: "brain",
+            sections: [
+                {
+                    chinese: "人工智能（AI）是计算机科学的一个分支，通过模拟人类智能过程来创建能够执行复杂任务的系统。",
+                    english: "<span>Artificial Intelligence (AI)</span> is a branch of computer science that creates systems simulating human intelligence processes.",
+                    phrases: [
+                        { title: "核心概念", chinese: "机器思考", english: "Machine thinking", explain: "计算机通过算法模拟人类思维" }
+                    ],
+                    vocab: [
+                        { cn: "人工智能", en: "AI", def: "能够执行智能任务的计算机系统", example: "人工智能已经改变了世界。" },
+                        { cn: "算法", en: "Algorithm", def: "解决问题的步骤序列", example: "AI使用算法来学习。" }
+                    ]
+                }
+            ]
+        }
+    ],
+    intermediate: [
+        {
+            topic: "神经网络",
+            icon: "🧬",
+            visual: "network",
+            sections: [
+                {
+                    chinese: "前馈神经网络由输入层、隐藏层和输出层组成。",
+                    english: "<span>Neural Networks</span> consist of input, hidden, and output layers.",
+                    phrases: [
+                        { title: "结构", chinese: "层次结构", english: "Layered structure", explain: "多层神经元互相连接" }
+                    ],
+                    vocab: [
+                        { cn: "神经网络", en: "Neural Network", def: "受脑结构启发的计算模型", example: "神经网络模仿大脑。" },
+                        { cn: "权重", en: "Weights", def: "连接强度参数", example: "权重通过训练学习。" }
+                    ]
+                }
+            ]
+        }
+    ],
+    advanced: [
+        {
+            topic: "计算机视觉",
+            icon: "👁️",
+            visual: "vision",
+            sections: [
+                {
+                    chinese: "物体检测任务要求不仅分类图像内容，还要精确定位所有物体的边界框。",
+                    english: "<span>Object Detection</span> requires both classification and precise bounding box localization.",
+                    phrases: [
+                        { title: "关键技术", chinese: "边界框预测", english: "Bounding box prediction", explain: "确定物体在图像中的位置和大小" }
+                    ],
+                    vocab: [
+                        { cn: "物体检测", en: "Object Detection", def: "定位和分类图像中的物体", example: "物体检测用于自动驾驶。" },
+                        { cn: "YOLO", en: "YOLO", def: "实时物体检测算法", example: "YOLO能快速检测物体。" }
+                    ]
+                }
+            ]
+        }
+    ]
+};
+
+let currentLevel = 'beginner';
+let currentTopic = 0;
+let currentSection = 0;
+let isPlaying = false;
+
+const levelBtns = document.querySelectorAll('.level-btn');
+const topicSelector = document.getElementById('topicSelector');
+const playAudioBtn = document.getElementById('playAudioBtn');
+const stopAudioBtn = document.getElementById('stopAudioBtn');
+const audioStatus = document.getElementById('audioStatus');
+const chineseText = document.getElementById('chineseText');
+const englishText = document.getElementById('englishText');
+const phrasesContainer = document.getElementById('phrasesContainer');
+const vocabList = document.getElementById('vocabList');
+const visualSvg = document.getElementById('visualSvg');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+const visualizations = {
+    brain: `<circle cx="150" cy="150" r="80" fill="#e0e7ff" stroke="#667eea" stroke-width="2"/>
+            <circle cx="120" cy="130" r="20" fill="#667eea"/>
+            <circle cx="150" cy="110" r="20" fill="#667eea"/>
+            <circle cx="180" cy="130" r="20" fill="#667eea"/>
+            <circle cx="120" cy="160" r="20" fill="#667eea"/>
+            <circle cx="180" cy="160" r="20" fill="#667eea"/>
+            <line x1="140" y1="150" x2="160" y2="130" stroke="#764ba2" stroke-width="2"/>
+            <line x1="140" y1="150" x2="160" y2="150" stroke="#764ba2" stroke-width="2"/>
+            <text x="150" y="220" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">AI Brain</text>`,
+    network: `<g id="nodes">
+                <circle cx="50" cy="100" r="15" fill="#667eea"/>
+                <circle cx="50" cy="200" r="15" fill="#667eea"/>
+                <circle cx="150" cy="75" r="15" fill="#764ba2"/>
+                <circle cx="150" cy="150" r="15" fill="#764ba2"/>
+                <circle cx="150" cy="225" r="15" fill="#764ba2"/>
+                <circle cx="250" cy="150" r="15" fill="#667eea"/>
+            </g>
+            <g id="connections" stroke="#667eea" stroke-width="1" opacity="0.6">
+                <line x1="65" y1="100" x2="135" y2="75"/>
+                <line x1="65" y1="100" x2="135" y2="150"/>
+                <line x1="65" y1="200" x2="135" y2="150"/>
+                <line x1="65" y1="200" x2="135" y2="225"/>
+                <line x1="165" y1="75" x2="235" y2="150"/>
+                <line x1="165" y1="150" x2="235" y2="150"/>
+                <line x1="165" y1="225" x2="235" y2="150"/>
+            </g>
+            <text x="150" y="280" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">Neural Network</text>`,
+    vision: `<rect x="50" y="50" width="200" height="150" fill="#e0e7ff" stroke="#667eea" stroke-width="2"/>
+            <circle cx="80" cy="90" r="15" fill="#764ba2"/>
+            <circle cx="150" cy="100" r="20" fill="#764ba2"/>
+            <circle cx="220" cy="110" r="15" fill="#764ba2"/>
+            <rect x="70" y="160" width="160" height="30" fill="#667eea" opacity="0.3" stroke="#667eea" stroke-width="2"/>
+            <text x="150" y="180" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">Objects Detected</text>
+            <text x="150" y="250" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">Computer Vision</text>`
+};
+
+function initLevel(level) {
+    currentLevel = level;
+    currentTopic = 0;
+    currentSection = 0;
+    stopAudio();
+
+    levelBtns.forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`[data-level="${level}"]`).classList.add('active');
+
+    updateTopicSelector();
+    displayContent();
+}
+
+function updateTopicSelector() {
+    topicSelector.innerHTML = '';
+    const levelData = contentData[currentLevel];
+
+    levelData.forEach((item, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'topic-btn' + (index === 0 ? ' active' : '');
+        btn.textContent = `${item.icon} ${item.topic}`;
+        btn.onclick = () => selectTopic(index);
+        topicSelector.appendChild(btn);
+    });
+}
+
+function selectTopic(index) {
+    currentTopic = index;
+    currentSection = 0;
+    stopAudio();
+    document.querySelectorAll('.topic-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', i === index);
+    });
+    displayContent();
+}
+
+function displayContent() {
+    const levelData = contentData[currentLevel];
+    const topic = levelData[currentTopic];
+    const section = topic.sections[currentSection];
+
+    if (!section) return;
+
+    chineseText.textContent = section.chinese;
+    englishText.innerHTML = section.english;
+
+    // ビジュアルを更新
+    const visualType = topic.visual || 'brain';
+    visualSvg.innerHTML = visualizations[visualType] || visualizations.brain;
+
+    // フレーズを表示
+    phrasesContainer.innerHTML = '';
+    section.phrases.forEach(phrase => {
+        const phraseBox = document.createElement('div');
+        phraseBox.className = 'phrase-box';
+        phraseBox.innerHTML = `
+            <div class="phrase-title">${phrase.title}</div>
+            <div class="phrase-text">🇨🇳 ${phrase.chinese}</div>
+            <div class="phrase-text">🇬🇧 ${phrase.english}</div>
+            <div class="phrase-text" style="color: #666;">📌 ${phrase.explain}</div>
+        `;
+        phrasesContainer.appendChild(phraseBox);
+    });
+
+    updateVocabulary(section.vocab);
+}
+
+function updateVocabulary(vocabItems) {
+    vocabList.innerHTML = '';
+
+    vocabItems.forEach((vocab, index) => {
+        const vocabItem = document.createElement('div');
+        vocabItem.className = 'vocab-item';
+        vocabItem.id = `vocab-${index}`;
+        vocabItem.innerHTML = `
+            <div class="vocab-chinese">🇨🇳 ${vocab.cn}</div>
+            <div class="vocab-english">🇬🇧 ${vocab.en}</div>
+            <div class="vocab-definition">📌 ${vocab.def}</div>
+            <button class="vocab-audio-btn" onclick="playVocabAudio(${index}, '${vocab.cn}', '${vocab.en}', '${vocab.def}', '${vocab.example}')">🔊 播放</button>
+        `;
+        vocabList.appendChild(vocabItem);
+    });
+}
+
+function playSceneAudio() {
+    if (isPlaying) {
+        stopAudio();
+        return;
+    }
+
+    isPlaying = true;
+    playAudioBtn.style.display = 'none';
+    stopAudioBtn.style.display = 'inline-block';
+    audioStatus.textContent = '🔊 播放中...';
+
+    const chinese = chineseText.textContent;
+    const english = englishText.textContent;
+
+    const speeches = [
+        { text: chinese, lang: 'zh-CN', rate: 0.9 },
+        { text: english, lang: 'en-US', rate: 1 }
+    ];
+
+    playNextSpeech(speeches, 0);
+}
+
+function playNextSpeech(speeches, index) {
+    if (!isPlaying || index >= speeches.length) {
+        stopAudio();
+        return;
+    }
+
+    const speech = speeches[index];
+    const utterance = new SpeechSynthesisUtterance(speech.text);
+    utterance.lang = speech.lang;
+    utterance.rate = speech.rate;
+
+    utterance.onend = () => {
+        playNextSpeech(speeches, index + 1);
+    };
+
+    utterance.onerror = () => {
+        stopAudio();
+    };
+
+    speechSynthesis.speak(utterance);
+}
+
+function playVocabAudio(index, cn, en, def, example) {
+    const vocabElement = document.getElementById(`vocab-${index}`);
+
+    if (isPlaying) {
+        stopAudio();
+        vocabElement.classList.remove('playing');
+        return;
+    }
+
+    isPlaying = true;
+    vocabElement.classList.add('playing');
+    playAudioBtn.style.display = 'none';
+    stopAudioBtn.style.display = 'inline-block';
+    audioStatus.textContent = `🔊 播放 ${cn}...`;
+
+    const speeches = [
+        { text: cn, lang: 'zh-CN', rate: 0.8 },
+        { text: cn, lang: 'zh-CN', rate: 0.8 },
+        { text: `${en}. It means ${def}`, lang: 'en-US', rate: 0.95 },
+        { text: example, lang: 'zh-CN', rate: 0.9 }
+    ];
+
+    playVocabSpeech(speeches, 0, vocabElement);
+}
+
+function playVocabSpeech(speeches, index, vocabElement) {
+    if (!isPlaying || index >= speeches.length) {
+        stopAudio();
+        vocabElement.classList.remove('playing');
+        return;
+    }
+
+    const speech = speeches[index];
+    const utterance = new SpeechSynthesisUtterance(speech.text);
+    utterance.lang = speech.lang;
+    utterance.rate = speech.rate;
+
+    utterance.onend = () => {
+        playVocabSpeech(speeches, index + 1, vocabElement);
+    };
+
+    utterance.onerror = () => {
+        stopAudio();
+        vocabElement.classList.remove('playing');
+    };
+
+    speechSynthesis.speak(utterance);
+}
+
+function stopAudio() {
+    speechSynthesis.cancel();
+    isPlaying = false;
+    playAudioBtn.style.display = 'inline-block';
+    stopAudioBtn.style.display = 'none';
+    audioStatus.textContent = '';
+
+    document.querySelectorAll('.vocab-item').forEach(item => {
+        item.classList.remove('playing');
+    });
+}
+
+function nextSection() {
+    stopAudio();
+    const levelData = contentData[currentLevel];
+    const topic = levelData[currentTopic];
+
+    if (currentSection < topic.sections.length - 1) {
+        currentSection++;
+        displayContent();
+        playSceneAudio();
+    }
+}
+
+function prevSection() {
+    stopAudio();
+    if (currentSection > 0) {
+        currentSection--;
+        displayContent();
+    }
+}
+
+levelBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        initLevel(e.target.dataset.level);
+    });
+});
+
+playAudioBtn.addEventListener('click', playSceneAudio);
+stopAudioBtn.addEventListener('click', stopAudio);
+nextBtn.addEventListener('click', nextSection);
+prevBtn.addEventListener('click', prevSection);
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') nextSection();
+    if (e.key === 'ArrowLeft') prevSection();
+});
+
+initLevel('beginner');
+    </script>
+</body>
+</html>
