@@ -123,6 +123,12 @@ body {
     animation: float 3s ease-in-out infinite;
 }
 
+#visualDiagram {
+    max-width: 250px;
+    max-height: 250px;
+    margin-bottom: 30px;
+}
+
 @keyframes float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-25px); }
@@ -387,7 +393,15 @@ body {
 
         <div class="content-section">
             <div class="visual-area">
-                <div class="visual-emoji" id="visualEmoji">🧠</div>
+                <svg id="visualDiagram" width="200" height="200" viewBox="0 0 200 200" style="animation: float 3s ease-in-out infinite;">
+                    <!-- Default AI Brain Diagram -->
+                    <g id="diagramContent">
+                        <circle cx="100" cy="100" r="80" fill="none" stroke="#667eea" stroke-width="2"/>
+                        <circle cx="100" cy="100" r="60" fill="none" stroke="#764ba2" stroke-width="2"/>
+                        <circle cx="100" cy="100" r="40" fill="none" stroke="#e74c3c" stroke-width="2"/>
+                        <circle cx="100" cy="100" r="15" fill="#667eea"/>
+                    </g>
+                </svg>
             </div>
 
             <div class="text-display">
@@ -598,6 +612,96 @@ function selectTopic(index) {
     displayContent();
 }
 
+function getSVGDiagram(topicName) {
+    const diagrams = {
+        'AI基础': `<g>
+            <rect x="30" y="50" width="140" height="100" fill="none" stroke="#667eea" stroke-width="2" rx="10"/>
+            <text x="100" y="75" text-anchor="middle" font-size="14" fill="#667eea" font-weight="bold">AI</text>
+            <circle cx="60" cy="120" r="25" fill="none" stroke="#764ba2" stroke-width="2"/>
+            <circle cx="100" cy="120" r="25" fill="none" stroke="#764ba2" stroke-width="2"/>
+            <circle cx="140" cy="120" r="25" fill="none" stroke="#764ba2" stroke-width="2"/>
+            <text x="60" y="125" text-anchor="middle" font-size="12" fill="#333">思考</text>
+            <text x="100" y="125" text-anchor="middle" font-size="12" fill="#333">学习</text>
+            <text x="140" y="125" text-anchor="middle" font-size="12" fill="#333">决策</text>
+        </g>`,
+        '机器学习': `<g>
+            <circle cx="100" cy="60" r="30" fill="none" stroke="#667eea" stroke-width="2"/>
+            <text x="100" y="65" text-anchor="middle" font-size="12" fill="#333">数据</text>
+            <line x1="100" y1="90" x2="70" y2="130" stroke="#764ba2" stroke-width="2"/>
+            <line x1="100" y1="90" x2="100" y2="130" stroke="#764ba2" stroke-width="2"/>
+            <line x1="100" y1="90" x2="130" y2="130" stroke="#764ba2" stroke-width="2"/>
+            <rect x="50" y="130" width="30" height="30" fill="none" stroke="#667eea" stroke-width="2" rx="5"/>
+            <rect x="85" y="130" width="30" height="30" fill="none" stroke="#667eea" stroke-width="2" rx="5"/>
+            <rect x="120" y="130" width="30" height="30" fill="none" stroke="#667eea" stroke-width="2" rx="5"/>
+            <text x="65" y="150" text-anchor="middle" font-size="10" fill="#333">模型</text>
+            <text x="100" y="150" text-anchor="middle" font-size="10" fill="#333">模型</text>
+            <text x="135" y="150" text-anchor="middle" font-size="10" fill="#333">模型</text>
+        </g>`,
+        '神经网络': `<g>
+            <circle cx="50" cy="50" r="15" fill="#667eea"/>
+            <circle cx="50" cy="100" r="15" fill="#667eea"/>
+            <circle cx="50" cy="150" r="15" fill="#667eea"/>
+            <circle cx="100" cy="75" r="15" fill="#764ba2"/>
+            <circle cx="100" cy="125" r="15" fill="#764ba2"/>
+            <circle cx="150" cy="100" r="15" fill="#e74c3c"/>
+            <line x1="65" y1="50" x2="85" y2="75" stroke="#999" stroke-width="1" opacity="0.5"/>
+            <line x1="65" y1="50" x2="85" y2="125" stroke="#999" stroke-width="1" opacity="0.5"/>
+            <line x1="65" y1="100" x2="85" y2="75" stroke="#999" stroke-width="1" opacity="0.5"/>
+            <line x1="65" y1="100" x2="85" y2="125" stroke="#999" stroke-width="1" opacity="0.5"/>
+            <line x1="65" y1="150" x2="85" y2="75" stroke="#999" stroke-width="1" opacity="0.5"/>
+            <line x1="65" y1="150" x2="85" y2="125" stroke="#999" stroke-width="1" opacity="0.5"/>
+            <line x1="115" y1="75" x2="135" y2="100" stroke="#999" stroke-width="1" opacity="0.5"/>
+            <line x1="115" y1="125" x2="135" y2="100" stroke="#999" stroke-width="1" opacity="0.5"/>
+        </g>`,
+        '自然语言处理': `<g>
+            <rect x="20" y="40" width="160" height="120" fill="none" stroke="#667eea" stroke-width="2" rx="10"/>
+            <text x="100" y="65" text-anchor="middle" font-size="12" fill="#333" font-weight="bold">语言处理</text>
+            <circle cx="50" cy="100" r="12" fill="#764ba2"/>
+            <circle cx="70" cy="95" r="12" fill="#764ba2"/>
+            <circle cx="90" cy="92" r="12" fill="#764ba2"/>
+            <circle cx="110" cy="95" r="12" fill="#764ba2"/>
+            <circle cx="130" cy="100" r="12" fill="#764ba2"/>
+            <circle cx="150" cy="108" r="12" fill="#764ba2"/>
+            <line x1="50" y1="112" x2="150" y2="120" stroke="#e74c3c" stroke-width="2"/>
+            <text x="100" y="140" text-anchor="middle" font-size="11" fill="#333">理解语言关系</text>
+        </g>`,
+        '计算机视觉': `<g>
+            <rect x="30" y="40" width="140" height="140" fill="none" stroke="#667eea" stroke-width="2" rx="10"/>
+            <text x="100" y="65" text-anchor="middle" font-size="12" fill="#333" font-weight="bold">图像识别</text>
+            <rect x="45" y="85" width="25" height="25" fill="#667eea" opacity="0.6"/>
+            <rect x="75" y="85" width="25" height="25" fill="#764ba2" opacity="0.6"/>
+            <rect x="105" y="85" width="25" height="25" fill="#e74c3c" opacity="0.6"/>
+            <rect x="135" y="85" width="15" height="25" fill="#f39c12" opacity="0.6"/>
+            <line x1="57" y1="120" x2="57" y2="135" stroke="#667eea" stroke-width="2"/>
+            <line x1="87" y1="120" x2="87" y2="135" stroke="#764ba2" stroke-width="2"/>
+            <line x1="117" y1="120" x2="117" y2="135" stroke="#e74c3c" stroke-width="2"/>
+            <text x="57" y="150" text-anchor="middle" font-size="9" fill="#333">物体</text>
+            <text x="87" y="150" text-anchor="middle" font-size="9" fill="#333">物体</text>
+            <text x="117" y="150" text-anchor="middle" font-size="9" fill="#333">物体</text>
+        </g>`,
+        '强化学习': `<g>
+            <circle cx="100" cy="60" r="35" fill="none" stroke="#667eea" stroke-width="2"/>
+            <text x="100" y="65" text-anchor="middle" font-size="11" fill="#333" font-weight="bold">环境</text>
+            <circle cx="60" cy="130" r="25" fill="none" stroke="#764ba2" stroke-width="2"/>
+            <text x="60" y="135" text-anchor="middle" font-size="10" fill="#333">代理</text>
+            <path d="M 75 95 Q 80 110 75 130" stroke="#e74c3c" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+            <path d="M 125 95 Q 120 110 125 130" stroke="#f39c12" stroke-width="2" fill="none" marker-end="url(#arrowhead2)"/>
+            <text x="45" y="110" font-size="10" fill="#333">反馈</text>
+            <text x="135" y="110" font-size="10" fill="#333">行动</text>
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                    <polygon points="0 0, 10 3, 0 6" fill="#e74c3c"/>
+                </marker>
+                <marker id="arrowhead2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                    <polygon points="0 0, 10 3, 0 6" fill="#f39c12"/>
+                </marker>
+            </defs>
+        </g>`
+    };
+
+    return diagrams[topicName] || diagrams['AI基础'];
+}
+
 function displayContent() {
     const levelData = contentData[currentLevel];
     const topic = levelData[currentTopic];
@@ -605,7 +709,9 @@ function displayContent() {
 
     if (!section) return;
 
-    visualEmoji.textContent = topic.emoji;
+    const svgContent = document.getElementById('diagramContent');
+    svgContent.innerHTML = getSVGDiagram(topic.topic);
+
     chineseText.textContent = section.chinese;
     englishText.innerHTML = section.english;
 
