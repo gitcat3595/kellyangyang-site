@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Learning Resources - AI, Robotics & Tech</title>
+    <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    color: white;
+    margin-bottom: 50px;
+}
+
+.header h1 {
+    font-size: 2.8em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.header p {
+    font-size: 1.2em;
+    opacity: 0.9;
+}
+
+.section {
+    background: white;
+    border-radius: 15px;
+    padding: 40px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+.section h2 {
+    color: #667eea;
+    font-size: 2em;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #667eea;
+}
+
+.category-title {
+    color: #764ba2;
+    font-size: 1.5em;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.resource-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.resource-card {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.resource-card:hover {
+    border-color: #667eea;
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+    transform: translateY(-5px);
+}
+
+.channel-name {
+    font-weight: bold;
+    color: #667eea;
+    font-size: 1.1em;
+    margin-bottom: 8px;
+}
+
+.video-title {
+    color: #333;
+    font-size: 0.95em;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.description {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.tag {
+    background: #e9ecef;
+    color: #667eea;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.8em;
+    font-weight: 600;
+}
+
+.youtube-link {
+    display: inline-block;
+    color: #667eea;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 10px;
+    padding: 8px 15px;
+    background: #e9ecef;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.youtube-link:hover {
+    background: #667eea;
+    color: white;
+}
+
+.tip-box {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 15px;
+    margin-top: 30px;
+    border-radius: 5px;
+}
+
+.tip-box h4 {
+    color: #856404;
+    margin-bottom: 8px;
+}
+
+.tip-box p {
+    color: #856404;
+    font-size: 0.95em;
+}
+
+.back-link {
+    display: inline-block;
+    color: white;
+    text-decoration: none;
+    margin-bottom: 30px;
+    font-weight: bold;
+    padding: 10px 20px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.back-link:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 1.8em;
+    }
+
+    .section {
+        padding: 20px;
+    }
+
+    .resource-list {
+        grid-template-columns: 1fr;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="advanced-v2.html" class="back-link">← Back to Learning App</a>
+
+        <div class="header">
+            <h1>📚 YouTube Learning Resources</h1>
+            <p>Curated Educational Content on AI, Robotics, Technology & Innovation</p>
+        </div>
+
+        <!-- AI & Machine Learning Section -->
+        <div class="section">
+            <h2>🤖 AI & Machine Learning</h2>
+
+            <div class="category-title">📖 Educational Channels</div>
+            <div class="resource-list">
+                <div class="resource-card">
+                    <div class="channel-name">3Blue1Brown</div>
+                    <div class="video-title">Neural Networks Playlist</div>
+                    <div class="description">Beautiful visualizations explaining how neural networks work, with deep mathematical insight into machine learning concepts.</div>
+                    <div class="tags">
+                        <span class="tag">Machine Learning</span>
+                        <span class="tag">Math</span>
+                        <span class="tag">Visualization</span>
+                    </div>
+                    <a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi" target="_blank" class="youtube-link">Watch Playlist</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">Simplilearn</div>
+                    <div class="video-title">Artificial Intelligence Tutorial for Beginners</div>
+                    <div class="description">Comprehensive introduction to AI, covering machine learning, deep learning, and real-world applications in an easy-to-understand format.</div>
+                    <div class="tags">
+                        <span class="tag">AI Basics</span>
+                        <span class="tag">Beginner</span>
+                        <span class="tag">Tutorial</span>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=WSiEHwEJtqM" target="_blank" class="youtube-link">Watch Video</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">Edureka</div>
+                    <div class="video-title">Machine Learning Full Course</div>
+                    <div class="description">Complete machine learning course covering supervised learning, unsupervised learning, and real-world use cases with practical examples.</div>
+                    <div class="tags">
+                        <span class="tag">ML</span>
+                        <span class="tag">Full Course</span>
+                        <span class="tag">Hands-on</span>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=Xj0Dretlf3U" target="_blank" class="youtube-link">Watch Course</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">DeepMind</div>
+                    <div class="video-title">AlphaGo - The Movie</div>
+                    <div class="description">Documentary about AlphaGo, DeepMind's AI program that defeated world champions, showcasing the power of machine learning.</div>
+                    <div class="tags">
+                        <span class="tag">AI Documentary</span>
+                        <span class="tag">Deep Learning</span>
+                        <span class="tag">History</span>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=WXuK6UKzrnI" target="_blank" class="youtube-link">Watch Video</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">StatQuest with Josh Starmer</div>
+                    <div class="video-title">Machine Learning Algorithms Explained</div>
+                    <div class="description">Clear explanations of various ML algorithms using simple animations and practical examples, perfect for understanding the fundamentals.</div>
+                    <div class="tags">
+                        <span class="tag">Algorithms</span>
+                        <span class="tag">Statistics</span>
+                        <span class="tag">Visual</span>
+                    </div>
+                    <a href="https://www.youtube.com/playlist?list=PLblh5JKOoLUICTaGLRoHQDuF_7q2GfuJF" target="_blank" class="youtube-link">Watch Playlist</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">Lex Fridman</div>
+                    <div class="video-title">Artificial Intelligence Podcast</div>
+                    <div class="description">In-depth conversations with leading AI researchers and entrepreneurs discussing the future of AI and its impact on society.</div>
+                    <div class="tags">
+                        <span class="tag">Interview</span>
+                        <span class="tag">Research</span>
+                        <span class="tag">Future</span>
+                    </div>
+                    <a href="https://www.youtube.com/playlist?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf" target="_blank" class="youtube-link">Watch Podcast</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Robotics Section -->
+        <div class="section">
+            <h2>🦾 Robotics & Automation</h2>
+
+            <div class="category-title">🤖 Robotics Education</div>
+            <div class="resource-list">
+                <div class="resource-card">
+                    <div class="channel-name">Boston Dynamics</div>
+                    <div class="video-title">Atlas Humanoid Robot</div>
+                    <div class="description">Showcase of Boston Dynamics' cutting-edge humanoid robot with incredible mobility and AI capabilities, demonstrating the future of robotics.</div>
+                    <div class="tags">
+                        <span class="tag">Robotics</span>
+                        <span class="tag">Humanoid</span>
+                        <span class="tag">Innovation</span>
+                    </div>
+                    <a href="https://www.youtube.com/c/BostonDynamics/videos" target="_blank" class="youtube-link">Visit Channel</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">Unitree Robotics</div>
+                    <div class="video-title">Quadruped Robot Demonstrations</div>
+                    <div class="description">Official Unitree channel showcasing their advanced quadruped robots like Go1, Go2, and B1SE with impressive motion and agility demonstrations.</div>
+                    <div class="tags">
+                        <span class="tag">Unitree</span>
+                        <span class="tag">Quadruped</span>
+                        <span class="tag">Go1/Go2</span>
+                    </div>
+                    <a href="https://www.youtube.com/@unitreerobotics" target="_blank" class="youtube-link">Visit Channel</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">FIRST Robotics</div>
+                    <div class="video-title">Robotics Competition & Education</div>
+                    <div class="description">Official channel of FIRST Robotics with inspiring videos about student robotics competitions and STEM education programs worldwide.</div>
+                    <div class="tags">
+                        <span class="tag">Education</span>
+                        <span class="tag">Competition</span>
+                        <span class="tag">STEM</span>
+                    </div>
+                    <a href="https://www.youtube.com/c/FIRSTRobotics/videos" target="_blank" class="youtube-link">Visit Channel</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">Robotics Back Basics</div>
+                    <div class="video-title">Robotics Programming & Design</div>
+                    <div class="description">Tutorials on robotics programming, design principles, and practical engineering with hands-on projects for beginners and advanced learners.</div>
+                    <div class="tags">
+                        <span class="tag">Programming</span>
+                        <span class="tag">Design</span>
+                        <span class="tag">DIY</span>
+                    </div>
+                    <a href="https://www.youtube.com/channel/UCv5Ur1pDPx5kcwNGIAhBZGg" target="_blank" class="youtube-link">Visit Channel</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">NASA JPL</div>
+                    <div class="video-title">Mars Rover Robotics</div>
+                    <div class="description">NASA's Jet Propulsion Laboratory channel showcasing advanced robotics used in space exploration, including Mars rovers and autonomous systems.</div>
+                    <div class="tags">
+                        <span class="tag">Space</span>
+                        <span class="tag">Automation</span>
+                        <span class="tag">NASA</span>
+                    </div>
+                    <a href="https://www.youtube.com/c/NASAJPL/videos" target="_blank" class="youtube-link">Visit Channel</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">Unbox Therapy</div>
+                    <div class="video-title">Latest Robot Technology Reviews</div>
+                    <div class="description">Reviews and demonstrations of latest robotics products and AI-powered devices, including consumer robots and tech innovations.</div>
+                    <div class="tags">
+                        <span class="tag">Reviews</span>
+                        <span class="tag">Products</span>
+                        <span class="tag">Tech</span>
+                    </div>
+                    <a href="https://www.youtube.com/c/UnboxTherapy/videos" target="_blank" class="youtube-link">Visit Channel</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tech Companies & Innovation Section -->
+        <div class="section">
+            <h2>🏢 Tech Companies & Innovation</h2>
+
+            <div class="category-title">🛍️ Alibaba Group</div>
+            <div class="resource-list">
+                <div class="resource-card">
+                    <div class="channel-name">Alibaba Group</div>
+                    <div class="video-title">Official Alibaba Channel</div>
+                    <div class="description">Official Alibaba channel featuring company news, innovations in e-commerce, cloud computing, and AI applications in business and society.</div>
+                    <div class="tags">
+                        <span class="tag">Alibaba</span>
+                        <span class="tag">E-commerce</span>
+                        <span class="tag">Innovation</span>
+                    </div>
+                    <a href="https://www.youtube.com/@AlibabaGroup" target="_blank" class="youtube-link">Visit Channel</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">Alibaba Tech Playground</div>
+                    <div class="video-title">AI & Cloud Technology</div>
+                    <div class="description">Explore Alibaba's cutting-edge AI technology, cloud computing solutions, and smart city initiatives transforming modern commerce.</div>
+                    <div class="tags">
+                        <span class="tag">AI</span>
+                        <span class="tag">Cloud</span>
+                        <span class="tag">Smart City</span>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=2y1b8zWMUNY" target="_blank" class="youtube-link">Watch Video</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">Ant Financial</div>
+                    <div class="video-title">FinTech Innovation</div>
+                    <div class="description">Ant Group's innovations in financial technology, digital payment systems, and AI applications in finance and inclusion.</div>
+                    <div class="tags">
+                        <span class="tag">FinTech</span>
+                        <span class="tag">Alibaba</span>
+                        <span class="tag">Finance</span>
+                    </div>
+                    <a href="https://www.youtube.com/results?search_query=Ant+Financial+Alibaba" target="_blank" class="youtube-link">Search Videos</a>
+                </div>
+            </div>
+
+            <div class="category-title">🌆 Huangzhou & Hangzhou Tech Hub</div>
+            <div class="resource-list">
+                <div class="resource-card">
+                    <div class="channel-name">Hangzhou Documentary</div>
+                    <div class="video-title">China's Silicon Valley - Hangzhou</div>
+                    <div class="description">Documentary about Hangzhou's transformation into China's tech hub, featuring Alibaba's impact and entrepreneurial ecosystem.</div>
+                    <div class="tags">
+                        <span class="tag">Hangzhou</span>
+                        <span class="tag">Tech Hub</span>
+                        <span class="tag">China</span>
+                    </div>
+                    <a href="https://www.youtube.com/results?search_query=Hangzhou+technology+hub+documentary" target="_blank" class="youtube-link">Search Videos</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">Chinese Tech Cities</div>
+                    <div class="video-title">Innovation in Hangzhou</div>
+                    <div class="description">Exploration of Hangzhou's role as an innovation center, its startup ecosystem, and technological advancement in Eastern China.</div>
+                    <div class="tags">
+                        <span class="tag">China</span>
+                        <span class="tag">Startups</span>
+                        <span class="tag">Tech</span>
+                    </div>
+                    <a href="https://www.youtube.com/results?search_query=Hangzhou+startup+ecosystem" target="_blank" class="youtube-link">Search Videos</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">Tech Influencers in China</div>
+                    <div class="video-title">Hangzhou School District Tech Integration</div>
+                    <div class="description">Coverage of how Hangzhou schools like Liulong Primary integrate AI and robotics education into their curriculum.</div>
+                    <div class="tags">
+                        <span class="tag">Education</span>
+                        <span class="tag">School</span>
+                        <span class="tag">AI</span>
+                    </div>
+                    <a href="https://www.youtube.com/results?search_query=Hangzhou+schools+robotics+AI+education" target="_blank" class="youtube-link">Search Videos</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Topics -->
+        <div class="section">
+            <h2>🚀 Advanced Topics & Future Tech</h2>
+
+            <div class="category-title">🤖 AI Applications</div>
+            <div class="resource-list">
+                <div class="resource-card">
+                    <div class="channel-name">Two Minute Papers</div>
+                    <div class="video-title">Latest AI Research Explained</div>
+                    <div class="description">Concise explanations of cutting-edge AI research papers, making complex AI advancements accessible to everyone in easy-to-digest videos.</div>
+                    <div class="tags">
+                        <span class="tag">AI Research</span>
+                        <span class="tag">Academic</span>
+                        <span class="tag">Innovation</span>
+                    </div>
+                    <a href="https://www.youtube.com/c/TwoMinutePapers/videos" target="_blank" class="youtube-link">Visit Channel</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">Computerphile</div>
+                    <div class="video-title">AI & Computer Science</div>
+                    <div class="description">In-depth videos from Oxford computer scientists explaining AI concepts, machine learning, neural networks, and computational theory.</div>
+                    <div class="tags">
+                        <span class="tag">Computer Science</span>
+                        <span class="tag">Academic</span>
+                        <span class="tag">Algorithms</span>
+                    </div>
+                    <a href="https://www.youtube.com/user/Computerphile/videos" target="_blank" class="youtube-link">Visit Channel</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">Veritasium</div>
+                    <div class="video-title">How AI Works</div>
+                    <div class="description">Science communicator Derek Muller explores how AI systems work, their limitations, and implications for society with engaging visuals.</div>
+                    <div class="tags">
+                        <span class="tag">AI Explained</span>
+                        <span class="tag">Science</span>
+                        <span class="tag">Visual</span>
+                    </div>
+                    <a href="https://www.youtube.com/results?search_query=Veritasium+artificial+intelligence" target="_blank" class="youtube-link">Search Videos</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">Yannic Kilcher</div>
+                    <div class="video-title">ML Papers Explained</div>
+                    <div class="description">Deep dives into important machine learning and AI research papers, explaining methodologies and breakthrough discoveries in the field.</div>
+                    <div class="tags">
+                        <span class="tag">ML Research</span>
+                        <span class="tag">Papers</span>
+                        <span class="tag">Technical</span>
+                    </div>
+                    <a href="https://www.youtube.com/c/YannicKilcher/videos" target="_blank" class="youtube-link">Visit Channel</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">Google AI</div>
+                    <div class="video-title">AI Research & Projects</div>
+                    <div class="description">Google's official AI channel featuring research breakthroughs, practical applications, and developments in machine learning and AI.</div>
+                    <div class="tags">
+                        <span class="tag">Google</span>
+                        <span class="tag">Research</span>
+                        <span class="tag">Industry</span>
+                    </div>
+                    <a href="https://www.youtube.com/c/GoogleAI/videos" target="_blank" class="youtube-link">Visit Channel</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="channel-name">OpenAI</div>
+                    <div class="video-title">AI Safety & Development</div>
+                    <div class="description">OpenAI's channel discussing AI research, ChatGPT, language models, and important considerations for AI safety and alignment.</div>
+                    <div class="tags">
+                        <span class="tag">OpenAI</span>
+                        <span class="tag">Large Language Models</span>
+                        <span class="tag">Safety</span>
+                    </div>
+                    <a href="https://www.youtube.com/c/OpenAI/videos" target="_blank" class="youtube-link">Visit Channel</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tips Section -->
+        <div class="section">
+            <div class="tip-box">
+                <h4>💡 Tips for Learning from YouTube</h4>
+                <p>
+                    <strong>1. Subscribe to channels:</strong> Hit the notification bell to stay updated on new educational content.<br><br>
+                    <strong>2. Create playlists:</strong> Organize videos by topic for structured learning.<br><br>
+                    <strong>3. Take notes:</strong> Pause videos frequently and write down key concepts.<br><br>
+                    <strong>4. Watch in series:</strong> Many channels have comprehensive playlists; watch them in order for better understanding.<br><br>
+                    <strong>5. Practice along:</strong> Follow coding tutorials and AI examples hands-on for better learning.<br><br>
+                    <strong>6. Watch at 1.25-1.5x speed:</strong> Save time while maintaining comprehension (or slow down if content is complex).<br><br>
+                    <strong>7. Combine resources:</strong> Watch different channels on the same topic to get multiple perspectives and explanations.
+                </p>
+            </div>
+        </div>
+
+        <footer style="text-align: center; color: white; margin-top: 40px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.2);">
+            <p>Created for AI & Robotics Learning | Last Updated: 2024</p>
+            <p style="font-size: 0.9em; opacity: 0.8;">Return to <a href="advanced-v2.html" style="color: #fff;">Learning App</a> or <a href="index.html" style="color: #fff;">Beginner Lessons</a></p>
+        </footer>
+    </div>
+</body>
+</html>
